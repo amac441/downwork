@@ -33,6 +33,8 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 import pandas as pd
 
+import time
+
 #wr=open('output.csv','w')
 timestamp=datetime.now()
 path_to_chromedriver = r"chromedriver.exe"
@@ -52,7 +54,7 @@ def checkcaptcha(params):
     # except:
     try:
         recap=browser.find_element_by_class_name("g-recaptcha")
-        raw_input("Need to bypass Captcha")
+        raw_input("Press Enter when Captcha bypassed")
     except:
         pass
 
@@ -206,8 +208,9 @@ def create_job(amount):
 
 
 #search members from list
-def findMembers(df,start,stop,messagetext,amount):
+def findMembers(df2,start,stop,messagetext,amount):
     #https://www.upwork.com/freelancers/_~01ff203de58fed31fb/
+    df=df2[start:stop].copy()
     df['worked']=''
     df['jobs']=''
     df['earned']=''
@@ -215,8 +218,7 @@ def findMembers(df,start,stop,messagetext,amount):
     df['success']=''
     df['availability']=''
 
-
-    for index, row in df[start:stop].iterrows():
+    for index, row in df.iterrows():
         #print row['c1'], row['c2']
         freeurl=row['id']
         # list = open(r"C:\Development\0117-DaiAnalysis\Upwork\freelancelist.txt",'r')
@@ -282,15 +284,20 @@ def findMembers(df,start,stop,messagetext,amount):
         textbox.clear()
         first=row['name'].split(" ",1)[0].title()
         textbox.send_keys(messagetext % (first, str(amount)))
+        time.sleep(1)
+
+        #SEND MESSAGE
         #browser.find_element_by_xpath('/html/body/div[3]/div[2]/div[1]/div/div/form/div/button').click()
 
         # df.loc[index,'new']=1
-        df[index,'worked']=worked
-        df[index,'jobs']=jobs
-        df[index,'earned']=earned
-        df[index,'accolade']=rising
-        df[index,'success']=success
-        df[index,'availability']=availtext
+        df.set_value(index,'worked',worked)
+        df.set_value(index,'jobs',jobs)
+        df.set_value(index,'earned',earned)
+        df.set_value(index,'accolade',rising)
+        df.set_value(index,'success',success)
+        df.set_value(index,'availability',availtext)
+
+    df.to_csv("Filled_Run_02_25_%s.csv" % start)
 
 # def getrandom(file,number):
 #     df=pd.read_csv(file)
@@ -299,6 +306,10 @@ def findMembers(df,start,stop,messagetext,amount):
 #     return sample
 
 if __name__ == "__main__":
+
+
+    start_time = time.time()
+
     print "Starting Script"
     try:
         number = sys.argv[1]
@@ -309,9 +320,7 @@ if __name__ == "__main__":
 
     messagetext='''Hello %s!
     \nI'd like to invite you to apply to my job that entails writing a blog article (800-1000 words; ~5 hours). Please review the job post and apply if you're available.
-    \n--Suggested hourly rate: $18 (It is not negotiable)
-    \n--Average hourly rate I have paid on Upwork: $%s
-    \nSunny'''
+    \n--Suggested hourly rate: $18 (It is not negotiable)\n--Average hourly rate I have paid on Upwork: $%s\nSunny'''
 
     params=['ajkrell@yahoo.com','gogogo123!']
 
@@ -326,7 +335,12 @@ if __name__ == "__main__":
     amount3=18
 
     file=r"2_24_sampele_75.csv"
-    #file=r"C:\Users\amac\Documents\Development\0117-DaiAnalysis\Upwork\2_24_sampele_10.csv"
+    file="2_24_sampele_10.csv"
+
+    try:
+        file=sys.argv[3]
+    except:
+        pass
     #number=75
     #start=0 #indicates where in the file to start reading
     #stop=25 #does not get row 25
@@ -340,19 +354,27 @@ if __name__ == "__main__":
     # for line in reader:
     #     dict_list.append(line)
     df=pd.read_csv(file)
-    dataparams={"1":[p1,amount1],"2":[p2,amount2],"3":[p3,amount3]}
+    dataparams={"0":[params,amount1],"1":[p1,amount1],"2":[p2,amount2],"3":[p3,amount3]}
 
     params=dataparams[number][0]
     amount=dataparams[number][1]
 
     start=(int(number)-1)*int(splitby)
     stop = int(number)*int(splitby)
+    if start<0:
+        start=0
+        stop=25
 
     login(params)
-    create_job(amount)
+    #create_job(amount)
+    print("--- %s seconds ---" % (time.time() - start_time))
 
+
+    raw_input("Enter to Send Messages: Start "+ str(start) + " Stop "+ str(stop) + " Amount " + str(amount))
     #login(params)
-    findMembers(df,start,stop,amount)
+    findMembers(df,start,stop,messagetext,amount)
+    print("--- %s seconds ---" % (time.time() - start_time))
 
+    browser.close()
 
 #review messages from members?
