@@ -124,18 +124,22 @@ def create_job(amount):
 
     jobtype="Writing"
 
-    time.sleep(2)
+    time.sleep(3)
     #ui.Select(browser.find_element_by_xpath('//*[@id="PostForm_categoryDropdown"]/div/div/button')).select_by_value(jobtype).click()
 
     #project type
-    # browser.find_element_by_xpath('//*[@id="PostForm_categoryDropdown"]/div/div/button').click()
-    # time.sleep(1)
-    #writing
-    element_to_hover_over=browser.find_element_by_xpath('//*[@id="PostForm_categoryDropdown"]/div/div/ul/li[6]/a')#.click()
-    #article and blog
-    submenue=browser.find_element_by_xpath('//*[@id="PostForm_categoryDropdown"]/div/div/ul/li[6]/ul/li[2]/a')#.click()
-    time.sleep(1)
-    ActionChains(browser).move_to_element(element_to_hover_over).click(submenue).perform()
+    #//*[@id="PostForm_categoryDropdown"]/div/div/button/span[1]
+    try:
+        browser.find_element_by_xpath('//*[@id="PostForm_categoryDropdown"]/div/div/button').click()
+        time.sleep(1)
+        #writing
+        element_to_hover_over=browser.find_element_by_xpath('//*[@id="PostForm_categoryDropdown"]/div/div/ul/li[6]/a')#.click()
+        #article and blog
+        submenue=browser.find_element_by_xpath('//*[@id="PostForm_categoryDropdown"]/div/div/ul/li[6]/ul/li[2]/a')#.click()
+        time.sleep(1)
+        ActionChains(browser).move_to_element(element_to_hover_over).click(submenue).perform()
+    except:
+        pass
 
     #data
     title="Looking for Writer of Blog Article on the Pros and Cons of Freelancing"

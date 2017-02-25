@@ -1,1 +1,1 @@
-python 01-17-upwork_scrape.py 2 25
+python 01-17-upwork_scrape.py 0 25
