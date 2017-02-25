@@ -339,7 +339,7 @@ if __name__ == "__main__":
     amount3=18
 
     file=r"2_24_sampele_75.csv"
-    file="2_24_sampele_10.csv"
+    #file="2_24_sampele_10.csv"
 
     try:
         file=sys.argv[3]
