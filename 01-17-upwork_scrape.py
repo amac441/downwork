@@ -335,7 +335,7 @@ if __name__ == "__main__":
     amount2=24
     #https://www.upwork.com/ab/jobs-home/3336361
 
-    p3=["gjm206yvrg@hotmail.com","ra123456."]
+    p3=["gjm206yvrg@hotmail.com","T4egxir54j"]
     amount3=18
 
     file=r"2_24_sampele_75.csv"
