@@ -45,7 +45,7 @@ browser = webdriver.Chrome(executable_path = path_to_chromedriver)
 
 #=========Login==============
 
-def checkcaptcha(params):
+def checkcaptcha(params=[]):
     # try:
     #     #look for "Captcha" request
     #     danger=browser.find_element_by_class_name('alert-danger')
@@ -64,7 +64,7 @@ def checkcaptcha(params):
     except:
         pass
 
-def login(params):
+def login(params,browser=browser):
     url=r"https://www.upwork.com/ab/account-security/login"
     url=r"https://www.upwork.com/ab/jobs-home/1189733"
     browser.get(url)
@@ -118,7 +118,7 @@ def login(params):
 # POST JOB DEDICATED
 #=============
 
-def create_job(amount):
+def create_job(amount,create='T'):
     postjoburl = r'https://www.upwork.com/c/1189733/jobs/new?enterprise=no'
     browser.get(postjoburl)
 
@@ -202,7 +202,10 @@ def create_job(amount):
     browser.find_element_by_xpath('//*[@id="PostForm_coverLetterRequired"]/div/label/span').click()
 
     #post job
-    browser.find_element_by_xpath('//*[@id="PostForm_actions_post"]').click()
+    if create=="T":
+        browser.find_element_by_xpath('//*[@id="PostForm_actions_post"]').click()
+    else:
+        raw_input("Waiting for Manual")
 
 #browser.find_element_by_xpath('
 #copywriting values
@@ -212,7 +215,7 @@ def create_job(amount):
 
 
 #search members from list
-def findMembers(df2,start,stop,messagetext,amount):
+def findMembers(df2,start,stop,messagetext,amount,create="T",browser=browser):
     #https://www.upwork.com/freelancers/_~01ff203de58fed31fb/
     df=df2[start:stop].copy()
     df['worked']=''
@@ -221,13 +224,14 @@ def findMembers(df2,start,stop,messagetext,amount):
     df['accolade']=''
     df['success']=''
     df['availability']=''
+    df['messaged']=""
 
     for index, row in df.iterrows():
         #print row['c1'], row['c2']
         freeurl=row['id']
         # list = open(r"C:\Development\0117-DaiAnalysis\Upwork\freelancelist.txt",'r')
         browser.get(freeurl)
-        time.sleep(1)
+        time.sleep(3)
 
         #search for ratings elements adn stuff..
         try:
@@ -242,11 +246,10 @@ def findMembers(df2,start,stop,messagetext,amount):
         # //*[@id="oProfilePage"]/div[2]/section[2]/h5[2]/top-rated/div/span[1]
 
         #success
-
         try:
             success=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[2]/section[2]/h5[1]/o-job-success/div/div/span').text
         except:
-            success=""
+            success=''
 
         #Availability
         availsec=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[2]/div[3]')
@@ -268,13 +271,31 @@ def findMembers(df2,start,stop,messagetext,amount):
         jobs="" # 18 jobs
         earned="" # $900+ earned
         for div in workdivs:
-            line=div.text.split(" ")
+            line=div.text
+            linesplit=line.split(" ")
             if 'worked' in line:
-                worked=line[0]
+                worked=linesplit[0]
             if 'job' in line:
-                jobs=line[0]
+                #CHECK JOBS
+                jobs=linesplit[0]
             if 'earned' in line:
-                earned=line[0]
+                earned=linesplit[0]
+
+        #in progress
+        prognum=0
+        try:
+            progstr=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/div[2]').text
+            prognum=int(progstr.split(" ",1)[0])
+        except:
+            try:
+                jobsdiv=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/ul')
+                for j in jobsdiv.find_element_by_class_name('li'):
+                    prog=j.find_element_by_class_name('em').text
+                    if "in progress" in prog:
+                        prognum+=1
+            except:
+                prognum=0
+
 
         time.sleep(1)
 
@@ -283,7 +304,6 @@ def findMembers(df2,start,stop,messagetext,amount):
         time.sleep(2)
 
         #invite.click()
-        time.sleep(1)
         textbox=browser.find_element_by_xpath('//*[@id="interview-invitation-popup-message"]')
         textbox.clear()
         first=row['name'].split(" ",1)[0].title()
@@ -291,7 +311,15 @@ def findMembers(df2,start,stop,messagetext,amount):
         time.sleep(1)
 
         #SEND MESSAGE
-        #browser.find_element_by_xpath('/html/body/div[3]/div[2]/div[1]/div/div/form/div/button').click()
+        if create=="T":
+            try:
+                browser.find_element_by_xpath('/html/body/div[3]/div[2]/div[1]/div/div/form/div/button').click()
+                #MARK AS SENT
+                df.set_value(index,'messaged',"Y")
+            except:
+                df.set_value(index,'messaged',"N")
+        else:
+            df.set_value(index,'messaged',"NA")
 
         # df.loc[index,'new']=1
         df.set_value(index,'worked',worked)
@@ -301,7 +329,8 @@ def findMembers(df2,start,stop,messagetext,amount):
         df.set_value(index,'success',success)
         df.set_value(index,'availability',availtext)
 
-    df.to_csv("Filled_Run_02_25_%s.csv" % start)
+    #CHANGE OUTFILE
+    return df
 
 # def getrandom(file,number):
 #     df=pd.read_csv(file)
@@ -309,76 +338,215 @@ def findMembers(df2,start,stop,messagetext,amount):
 #     sample.to_csv("2_24_sampele_"+str(number)+".csv")
 #     return sample
 
+#===================
+
+import datetime
+import time
+ts = time.time()
+
+def proposals(proplist,browser=browser):
+    # proplist=[]
+    for prop in proplist:
+        time.sleep(1)
+        list = proplist[prop]
+        url=list[-1]
+        #get proposal URL
+        if url!='Withdrew':
+            browser.get(url)
+            time.sleep(2)
+            checkcaptcha()
+            amt=browser.find_element_by_xpath('//*[@id="layout"]/div[2]/div[2]/div/div/div[2]/div/div[1]/div[1]/div/div[1]/div[3]/h1').text
+            list.append(amt)
+            proplist[prop]=list
+
+    return proplist
+
+def read_message(browser=browser):
+    url=r'https://www.upwork.com/messages/'
+    browser.get(url)
+    time.sleep(1)
+    checkcaptcha()
+
+    proposals={}
+    # //*[@id="room-nav"]/div[2]/div/div/div[3]/div/ul
+    try:
+        table=browser.find_element_by_xpath('*[@id="room-main-body"]/div[2]/ui-view/div/table/tbody')
+        table=browser.find_element_by_xpath('//*[@id="room-nav"]/div[2]/div/div/div[3]/div/ul')
+
+    except:
+        try:
+            table=browser.find_element_by_xpath('//*[@id="room-nav"]/div[2]/div/div/ul')
+        except:
+            print "No Interviews Table"
+            sys.exit(1)
+
+    #interview=browser.find_element_by_xpath('*[@id="room-nav"]/div[2]/div/div/div[3]/div')
+    for item in table.find_elements_by_tag_name('li'):
+        name=item.find_element_by_class_name('room-list-name-span').text
+        name=name.split("\n",1)[1]
+        item.click()
+        time.sleep(2)
+
+        #messages=browser.find_element_by_xpath('//*[@id="story-box"]/div[1]/div/div[2]/div[2]/div')
+        textdiv=browser.find_element_by_xpath('//*[@id="story-box"]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div/div/div[3]/div/div/div/div/div/div/span')
+        # messagedate=...
+        messagetime=browser.find_element_by_xpath('//*[@id="story-box"]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div/div/span/a/span').get_attribute('title')
+        message=textdiv.text
+        message=availtext='--'.join(message.splitlines())
+        #proposal link
+        try:
+            proposal_url=textdiv.find_element_by_tag_name('a').get_attribute("href")
+        except:
+            proposal_url="No Proposal URL"
+
+        st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        #name
+        #name=browser.find_element_by_xpath('//*[@id="story-box"]/div[1]/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div[2]/span')
+
+        #{Name:[data],Name:[data]}
+        proposals[name]=[name,messagetime,message,proposal_url]
+
+    return proposals
+
+import csv
+import os
 if __name__ == "__main__":
 
-
+    print os.getcwd()
     start_time = time.time()
 
     print "Starting Script"
     try:
         number = sys.argv[1]
-        splitby = sys.argv[2]
     except:
-        print "Provide inputs: [number - specifying which accounts to go after] [splitby - how many rows to read]"
+        print "Provide inputs: [number - specifying which accounts to go after] [optional: runtype (create,iterate,read-T,F)] [optional:inputfile location] [optional: splitby - how many rows to read]"
         sys.exit(1)
 
-    messagetext='''Hello %s!
-    \nI'd like to invite you to apply to my job that entails writing a blog article (800-1000 words; ~5 hours). Please review the job post and apply if you're available.
-    \n--Suggested hourly rate: $18 (It is not negotiable)\n--Average hourly rate I have paid on Upwork: $%s\nSunny'''
+    try:
+        type=sys.argv[2].split('-')
+        try:
+            create=type[1] #T or F
+        except:
+            create='F'
 
-    params=['ajkrell@yahoo.com','gogogo123!']
-
-    p1=["low.jennifer.miller0921@gmail.com","ra123456."]
-    amount1=12
-
-    p2=["high.jennifer.miller0921@gmail.com","ra123456."]
-    amount2=24
-    #https://www.upwork.com/ab/jobs-home/3336361
-
-    p3=["hcyq10ar27@hotmail.com","729noox9tq"]
-    amount3=18
-
-    file=r"2_24_sampele_75.csv"
-    #file="2_24_sampele_10.csv"
+        type=type[0]
+    except:
+        print ("Reading Messages")
+        type='read'
 
     try:
-        file=sys.argv[3]
+        inputfile=sys.argv[3]
     except:
-        pass
-    #number=75
-    #start=0 #indicates where in the file to start reading
-    #stop=25 #does not get row 25
-    #if you split this by 3, you would want to start at 24 and 49
+        print ("Using Input.csv")
+        inputfile="input.csv"
 
-    #getrandom(file,number)
+    # inputcsv = open(inputfile,'r')
+    # input = csv.reader(inputcsv)
+    # next(input, None)  # skip the headers
+    input = pd.read_csv(inputfile)
 
-    # #Read a csv as a dictionary
-    # reader = csv.DictReader(open(file, 'rb'))
-    # dict_list = []
-    # for line in reader:
-    #     dict_list.append(line)
-    df=pd.read_csv(file)
-    dataparams={"0":[params,amount1],"1":[p1,amount1],"2":[p2,amount2],"3":[p3,amount3]}
+    userow=input[input.id==int(number)].values.tolist()[0]
+    baseline=input[input.id==int(0)].values.tolist()[0]
+    params=[userow[1],userow[2]]
+    amount=str(userow[3])
 
-    params=dataparams[number][0]
-    amount=dataparams[number][1]
+    invitemessagetext=userow[4].encode('utf-8')
+    if invitemessagetext.lower()=="same":
+        invitemessagetext=baseline[4].encode('utf-8')
 
-    start=(int(number)-1)*int(splitby)
-    stop = int(number)*int(splitby)
+    file=userow[5]
+    if file.lower()=="same":
+        file=baseline[5]
+
+    outfile=userow[6]
+    if outfile.lower()=="same":
+        outfile=baseline[6]
+
+    invitemessagetext='''Hello %s!
+    \nI'd like to invite you to apply to my job that entails writing a blog article (800-1000 words; ~5 hours). Please review the job post and apply if you're available.
+    \n--Suggested hourly rate: $18 (It is not negotiable)\n--Average hourly rate I have paid on Upwork: $%s\nSunny'''
+    # params=['ajkrell@yahoo.com','gogogo123!']
+    # p1=["low.jennifer.miller0921@gmail.com","ra123456."]
+    # amount1=12
+    # p2=["high.jennifer.miller0921@gmail.com","ra123456."]
+    # amount2=24
+    # #https://www.upwork.com/ab/jobs-home/3336361
+    # #p3=["hcyq10ar27@hotmail.com","729noox9tq"]
+    # p3=["gjm206yvrg@hotmail.com","t4egxir54j"]
+    # amount3=18
+    # file=r"2_24_sampele_75.csv"
+    # #file="2_24_sampele_10.csv"
+
+    dfresource=pd.read_csv(file)
+
+    start=(int(number)-1)*25
+    stop = int(number)*25
     if start<0:
         start=0
         stop=25
 
-    login(params)
-    create_job(amount)
-    print("--- %s seconds ---" % (time.time() - start_time))
+
+    if type=="iterate":
+        #csvname=r"C:\Users\amac\Documents\GoogleDrive\Washu\01-17-Dai\Upwork\UpworkShared\Filled_Run_02_25_all.csv"
+        dfout = pd.read_csv(outfile)
+
+        # row_iterator = input.iterrows()
+        # _, last = row_iterator.next()  # take first item from row_iterator
+
+        for index,row in input.iterrows():
+            num=int(row['id'])
+            if num!=0:
+                row=list(row)
+                browser = webdriver.Chrome(executable_path = path_to_chromedriver)
+                params=[row[1],row[2]]
+                login(params,browser)
+                proplist=read_message(browser)
+                proplist2=proposals(proplist,browser)
+                df2=dfout[num-1:num*25] #slice df
+                for p in proplist2:
+                    try:
+                        name = p.split(' ',1)
+                        fname=name[0]
+                        lname=name[1][0] #first initial
+                        name2=fname+" "+lname
+                        dfindex=df2[df2.name.str.contains(name2)].index
+                        dfout.loc[dfindex,'MessageTime']=proplist[p][1]
+                        dfout.loc[dfindex,'MessageText']=proplist[p][2] #text
+                        dfout.loc[dfindex,'ProposalAmount']=proplist[p][4] #amount
+                        a=1
+                    except:
+                        pass
+                browser.close()
+
+        try:
+            dfout.to_csv("Final_"+outfile+".csv",encoding='utf-8')
+        except:
+            dfout.to_csv("Final_"+outfile+".csv",sep='\t',encoding='utf-8')
 
 
-    raw_input("Enter to Send Messages: Start "+ str(start) + " Stop "+ str(stop) + " Amount " + str(amount))
-    #login(params)
-    findMembers(df,start,stop,messagetext,amount)
-    print("--- %s seconds ---" % (time.time() - start_time))
+    elif type=="submit" or type=="create":
+        login(params)
+        if type=="create":
+            create_job(amount,create)
+            print("--- %s seconds ---" % (time.time() - start_time))
+            raw_input("Enter to Send Messages: Start "+ str(start) + " Stop "+ str(stop) + " Amount " + str(amount))
 
+        #login(params)
+        dfresource['login']=params[0]
+        dfresource['password']=params[1]
+        dataframe=findMembers(dfresource,start,stop,invitemessagetext,amount,create)
+        dataframe.to_csv("%s_"+outfile % start)
+        print("--- %s seconds ---" % (time.time() - start_time))
+
+    elif type=='read':
+        login(params)
+        proplist=read_message()
+        proplist2=proposals(proplist)
+        f=open('proposals'+number+'.txt','w')
+        f.write(str(proplist2))
+        f.close()
+        #read responses
+    raw_input("Press Enter to close browser ")
     browser.close()
 
 #review messages from members?
