@@ -118,7 +118,7 @@ def login(params,browser=browser):
 # POST JOB DEDICATED
 #=============
 
-def create_job(amount,create='T'):
+def create_job(amount,create='T',negot="not negotiable"):
     postjoburl = r'https://www.upwork.com/c/1189733/jobs/new?enterprise=no'
     browser.get(postjoburl)
 
@@ -147,18 +147,25 @@ def create_job(amount,create='T'):
         \nThis will be done on a ghost writing basis. Research and writing will be involved. Please use links for source information.The content will focus on what the available literature says about the advantages and disadvantages of freelancing.If appropriate, possibly include small segment of one freelancer’s personal experience.
         \nThe target audience is people in the general public considering freelance work who desire more information.The style is to be informal, interesting, and engaging. Language is English (American). Suggestions for images are a plus but not required.
         \nEstimated length: 800-1000 words\nEstimated length of time for project: 5 hours (to include one re-edit)\nDeadline: March 10, 2017
-        \nSuggested hourly rate: $18 (It is not negotiable.)\nAverage hourly rate I have paid on Upwork: $%s
-        ''' % amount
+        \nSuggested hourly rate: $18 (It is %s.)\nAverage hourly rate I have paid on Upwork: $%s
+        ''' % (negot, amount)
 
-    skills = ['Article Writing','Blog Writing', 'Content Writing', 'Research']
+    skills = ['Article Writing','Blog Writing', 'Content Writing', 'Internet Research']
 
     #Title
     browser.find_element_by_xpath('//*[@id="PostForm_title"]').send_keys(title)
     browser.find_element_by_xpath('//*[@id="PostForm_description"]').send_keys(description)
     #WebElement.send_keys(Keys.RETURN);
     browser.find_element_by_xpath('//*[@id="PostForm_employmentType"]/div[1]/label').click()
-    skillslabel=browser.find_element_by_xpath('//*[@id="layout"]/div[2]/div[2]/div/form/div/div/div[2]/div/div/div[6]/div/div[2]/div/div/div[1]/div/div/div/div[1]/div/input')
-
+    try:
+        skillslabel=browser.find_element_by_xpath('//*[@id="layout"]/div[2]/div[2]/div/form/div/div/div[2]/div/div/div[6]/div/div[2]/div/div/div[1]/div/div/div/div[1]/div/input')
+    except:
+        try:
+            skillslabel=browser.find_element_by_xpath('//*[@id="layout"]/div[2]/div[2]/div/form/div/div/div[2]/div/div/div[5]/div/div[2]/div/div/div[1]/div/div/div/div[1]/div/input')
+        except:
+            skills=[]
+            print "NO SKILLS"
+                                                      
     for skill in skills:
         skillslabel.send_keys(skill)
         time.sleep(3)
@@ -183,29 +190,31 @@ def create_job(amount,create='T'):
     #qualificatinos
     browser.find_element_by_xpath('//*[@id="PostForm_qualifications"]/button').click()
 
-    type=browser.find_element_by_xpath('//*[@id="PostForm_qualifications_freelancerType"]')
-    indp=browser.find_element_by_xpath('//*[@id="PostForm_qualifications"]/div/div[1]/div[2]/div/div/ul/li[2]/a')
+    typ1=browser.find_element_by_xpath('//*[@id="PostForm_qualifications_freelancerType"]')
+    indp=browser.find_element_by_xpath('//*[@id="PostForm_qualifications"]/div/div[1]/div[2]/div/div/ul/li[2]')
     time.sleep(1)
-    ActionChains(browser).move_to_element(type).click(indp).perform()
+    ActionChains(browser).move_to_element(typ1).click(indp).perform()
 
-    type=browser.find_element_by_xpath('//*[@id="PostForm_qualifications_jobSuccessScore"]')
-    indp=browser.find_element_by_xpath('//*[@id="PostForm_qualifications"]/div/div[2]/div[2]/div/div/ul/li[1]/a')
+    typ2=browser.find_element_by_xpath('//*[@id="PostForm_qualifications_jobSuccessScore"]')
+                                        #//*[@id="PostForm_qualifications_jobSuccessScore"]
+    indp=browser.find_element_by_xpath('//*[@id="PostForm_qualifications"]/div/div[2]/div[2]/div/div/ul/li[1]')
+    
     time.sleep(1)
-    ActionChains(browser).move_to_element(type).click(indp).perform()
+    ActionChains(browser).move_to_element(typ2).click(indp).perform()
 
-    type=browser.find_element_by_xpath('//*[@id="PostForm_qualifications_oDeskHours"]')
-    indp=browser.find_element_by_xpath('//*[@id="PostForm_qualifications"]/div/div[4]/div[2]/div/div/ul/li[2]/a')
+    typ3=browser.find_element_by_xpath('//*[@id="PostForm_qualifications_oDeskHours"]')
+    indp=browser.find_element_by_xpath('//*[@id="PostForm_qualifications"]/div/div[4]/div[2]/div/div/ul/li[2]')
     time.sleep(1)
-    ActionChains(browser).move_to_element(type).click(indp).perform()
+    ActionChains(browser).move_to_element(typ3).click(indp).perform()
 
     #no cover letter
     browser.find_element_by_xpath('//*[@id="PostForm_coverLetterRequired"]/div/label/span').click()
 
     #post job
-    if create=="T":
-        browser.find_element_by_xpath('//*[@id="PostForm_actions_post"]').click()
-    else:
-        raw_input("Waiting for Manual")
+
+    raw_input("Waiting for Manual")
+    browser.find_element_by_xpath('//*[@id="PostForm_actions_post"]').click()
+        
 
 #browser.find_element_by_xpath('
 #copywriting values
@@ -215,7 +224,7 @@ def create_job(amount,create='T'):
 
 
 #search members from list
-def findMembers(df2,start,stop,messagetext,amount,create="T",browser=browser):
+def findMembers(df2,start,stop,messagetext,amount,create="T",negot='not negotiable'):
     #https://www.upwork.com/freelancers/_~01ff203de58fed31fb/
     df=df2[start:stop].copy()
     df['worked']=''
@@ -225,6 +234,8 @@ def findMembers(df2,start,stop,messagetext,amount,create="T",browser=browser):
     df['success']=''
     df['availability']=''
     df['messaged']=""
+    df['job_in_progres']=''
+    df['scraped_rate']=''
 
     for index, row in df.iterrows():
         #print row['c1'], row['c2']
@@ -251,13 +262,21 @@ def findMembers(df2,start,stop,messagetext,amount,create="T",browser=browser):
         except:
             success=''
 
+        try:
+            rate=browser.find_element_by_xpath('//*[@id="optimizely-header-container-default"]/div[1]/div[1]/div/div[2]/h2/div/span/span[1]').text
+        except:
+            rate=''
+        
         #Availability
-        availsec=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[2]/div[3]')
-        availdivs=availsec.find_elements_by_tag_name('div')
-        availtext=''
-        for div in availdivs:
-            line=div.text
-            availtext+=line
+        try:
+            availsec=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[2]/div[3]')
+            availdivs=availsec.find_elements_by_tag_name('div')
+            availtext=''
+            for div in availdivs:
+                line=div.text
+                availtext+=line
+        except:
+            pass
 
         availtext=''.join(availtext.splitlines())
         #work history
@@ -265,21 +284,24 @@ def findMembers(df2,start,stop,messagetext,amount,create="T",browser=browser):
         # //*[@id="oProfilePage"]/div[2]/section[2]/div
         # //*[@id="oProfilePage"]/div[2]/section[2]/div #with rising talent
         # //*[@id="oProfilePage"]/div[2]/section[2]/div
-        workhistorysect=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[2]/section[2]/div')
-        workdivs=workhistorysect.find_elements_by_tag_name('div')
         worked="" # 16 hours worked
         jobs="" # 18 jobs
         earned="" # $900+ earned
-        for div in workdivs:
-            line=div.text
-            linesplit=line.split(" ")
-            if 'worked' in line:
-                worked=linesplit[0]
-            if 'job' in line:
-                #CHECK JOBS
-                jobs=linesplit[0]
-            if 'earned' in line:
-                earned=linesplit[0]
+        try:
+            workhistorysect=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[2]/section[2]/div')
+            workdivs=workhistorysect.find_elements_by_tag_name('div')
+            for div in workdivs:
+                line=div.text
+                linesplit=line.split(" ")
+                if 'worked' in line:
+                    worked=linesplit[0]
+                if 'job' in line:
+                    #CHECK JOBS
+                    jobs=linesplit[0]
+                if 'earned' in line:
+                    earned=linesplit[0]
+        except:
+            pass
 
         #in progress
         prognum=0
@@ -300,14 +322,17 @@ def findMembers(df2,start,stop,messagetext,amount,create="T",browser=browser):
         time.sleep(1)
 
         #find invite element
-        browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[2]/section[1]/div[1]/div/button/span').click()
+        try:
+            browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[2]/section[1]/div[1]/div/button/span').click()
+        except:
+            pass
         time.sleep(2)
 
         #invite.click()
         textbox=browser.find_element_by_xpath('//*[@id="interview-invitation-popup-message"]')
         textbox.clear()
         first=row['name'].split(" ",1)[0].title()
-        textbox.send_keys(messagetext % (first, str(amount)))
+        textbox.send_keys(messagetext % (first, negot, str(amount)))
         time.sleep(1)
 
         #SEND MESSAGE
@@ -328,6 +353,8 @@ def findMembers(df2,start,stop,messagetext,amount,create="T",browser=browser):
         df.set_value(index,'accolade',rising)
         df.set_value(index,'success',success)
         df.set_value(index,'availability',availtext)
+        df.set_value(index,'scraped_rate',rate)
+        df.set_value(index,'job_in_progress',str(prognum))
 
     #CHANGE OUTFILE
     return df
@@ -462,9 +489,12 @@ if __name__ == "__main__":
     if outfile.lower()=="same":
         outfile=baseline[6]
 
+    negot=str(userow[7])
+
     invitemessagetext='''Hello %s!
     \nI'd like to invite you to apply to my job that entails writing a blog article (800-1000 words; ~5 hours). Please review the job post and apply if you're available.
-    \n--Suggested hourly rate: $18 (It is not negotiable)\n--Average hourly rate I have paid on Upwork: $%s\nSunny'''
+    \n--Suggested hourly rate: $18 (It is %s)\n--Average hourly rate I have paid on Upwork: $%s\nSunny'''
+
     # params=['ajkrell@yahoo.com','gogogo123!']
     # p1=["low.jennifer.miller0921@gmail.com","ra123456."]
     # amount1=12
@@ -527,15 +557,15 @@ if __name__ == "__main__":
     elif type=="submit" or type=="create":
         login(params)
         if type=="create":
-            create_job(amount,create)
+            create_job(amount,create,negot)
             print("--- %s seconds ---" % (time.time() - start_time))
             raw_input("Enter to Send Messages: Start "+ str(start) + " Stop "+ str(stop) + " Amount " + str(amount))
 
         #login(params)
         dfresource['login']=params[0]
         dfresource['password']=params[1]
-        dataframe=findMembers(dfresource,start,stop,invitemessagetext,amount,create)
-        dataframe.to_csv("%s_"+outfile % start)
+        dataframe=findMembers(dfresource,start,stop,invitemessagetext,amount,create,negot)
+        dataframe.to_csv("2_27_"+outfile)
         print("--- %s seconds ---" % (time.time() - start_time))
 
     elif type=='read':
