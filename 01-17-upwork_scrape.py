@@ -565,7 +565,7 @@ if __name__ == "__main__":
         dfresource['login']=params[0]
         dfresource['password']=params[1]
         dataframe=findMembers(dfresource,start,stop,invitemessagetext,amount,create,negot)
-        dataframe.to_csv("2_27_"+outfile)
+        dataframe.to_csv("3-1_"+outfile)
         print("--- %s seconds ---" % (time.time() - start_time))
 
     elif type=='read':
