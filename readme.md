@@ -13,7 +13,7 @@ ipython # for interactive development (I'm usining the jupyter anaconda distribu
 pandas
 numpy
 ```
-[chromedriver.exe](https://sites.google.com/a/chromium.org/chromedriver/) will need to be downloaded and placed alongside the main.py script. 
+[chromedriver.exe](https://sites.google.com/a/chromium.org/chromedriver/) will need to be downloaded and placed alongside the main.py script.
 
 ### Overview of Files
 
@@ -32,7 +32,8 @@ numpy
 <a name="main"></a>
 ## Main Upwork Script
 
-This script does the following tasks
+This is the main script used to automate the messaging of upwork candidates. This script does the following tasks:
+
 * Logging Into Upwork
 * *Create* a Job under a specific account
 * *Submit* Invite to Candidates under a specific account (in batches of 25)
