@@ -21,9 +21,8 @@ numpy
   * **Input.csv** - the input file for the master script - contains login data
 
 * [03_02_Reading_Resources.ipynb](#readAPI) - Aggregating API Reads, Filtering Data, and Marking already used data (Creating a new master)
-* [[mark_used.py]](#supplement) - generalized script for marking used files within a "Master" list
-* [[manual_people_search.py]](#suppleemnt) - Compile list through manual search, as opposed to API, doesnt include accessign their details
-* [[api_people_search.py]](#supplement) - search people using the API
+* [mark_used.py](#supplement) - generalized script for marking used files within a "Master" list
+* [api_people_search.py](#supplement) - search people using the API
 * **Data Files**
   * **All_Writers_18k.csv** - File from API Pull including "Already Used people"
   * **Merged_Batch_1** - Batch 1 results.
@@ -78,6 +77,7 @@ There are several iPython notebooks in the repository with various functions to 
 Here's an example of how to load a collection of CSVs and dropping duplicates using python pandas.
 
 ```
+from MultiProcessDataframe import callfunction
 basefolder=r'C:\Users\amac\Documents\GoogleDrive\Washu\01-17-Dai\Upwork\UpworkShared\Batch1\Batch1Input\159'
 print ("Calling MultiProcess")
 b159 = callfunction(basefolder)
