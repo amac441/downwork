@@ -1,7 +1,0 @@
-id,email,password,amount,inviteMessage,prospectFile,outputfile,negot
-0,ajkrell@yahoo.com,gogogo123!,12,"Hello %s!
-    \nI'd like to invite you to apply to my job that entails writing a blog article (800-1000 words; ~5 hours). Please review the job post and apply if you're available.
-    \n--Suggested hourly rate: $18 (It is not negotiable)\n--Average hourly rate I have paid on Upwork: $%s\nSunny",2_24_sampele_75.csv,Filled_Run_02_25_0.csv,not negotiable
-1,low.jennifer.miller0921@gmail.com,ra123456.,12,same,same,same,not negotiable
-2,high.jennifer.miller0921@gmail.com,ra123456.,24,same,same,same,negotiable
-3,gjm206yvrg@hotmail.com,t4egxir54j,18,same,same,same,not negotiable

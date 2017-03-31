@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+input.csv
 
 # C extensions
 *.so
@@ -19,6 +20,8 @@ lib64/
 parts/
 sdist/
 var/
+api/
+venv/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -58,4 +61,3 @@ target/
 
 .settings
 env
-*.bat
