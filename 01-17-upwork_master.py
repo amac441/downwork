@@ -34,6 +34,9 @@ from selenium.webdriver.common.keys import Keys
 import pandas as pd
 
 import time
+import datetime
+now = datetime.datetime.now()
+dater=now.year+"_"+now.month+"_"+now.day
 
 #wr=open('output.csv','w')
 timestamp=datetime.now()
@@ -664,10 +667,11 @@ if __name__ == "__main__":
         # with open(inputfile, ‘rb’) as f:
         # reader = csv.reader(f)
         # for row in reader:
-        mod=4
+        mod=1
         dataframe=findMembers(dfresource,start,stop,invitemessagetext,amount,create,negot,mod)
-
-        dataframe.to_csv("3-23_manual_details.csv")
+	
+		
+        dataframe.to_csv(dater+"_manual_details.csv")
         raw_input("Done with Details")
         browser.close()
         sys.exit(0)
@@ -766,9 +770,9 @@ if __name__ == "__main__":
                 browser.close()
 
         try:
-            dfout.to_csv("Final_"+outfile+".csv",encoding='utf-8')
+            dfout.to_csv(dater+"Final_"+outfile+".csv",encoding='utf-8')
         except:
-            dfout.to_csv("Final_"+outfile+".csv",sep='\t',encoding='utf-8')
+            dfout.to_csv(dater+"Final_"+outfile+".csv",sep='\t',encoding='utf-8')
 
     elif type=='progress':
         login(params)
@@ -789,7 +793,7 @@ if __name__ == "__main__":
         dfresource['password']=params[1]
         dataframe=findMembers(dfresource,start,stop,invitemessagetext,amount,create,negot)
 
-        dataframe.to_csv("3-1_"+outfile)
+        dataframe.to_csv(dater+outfile)
 
         print("--- %s seconds ---" % (time.time() - start_time))
 
