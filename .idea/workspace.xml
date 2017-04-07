@@ -34,8 +34,8 @@
       <file leaf-file-name="01-17-upwork_master.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/01-17-upwork_master.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="236">
-              <caret line="782" column="71" lean-forward="true" selection-start-line="782" selection-start-column="71" selection-end-line="782" selection-end-column="71" />
+            <state relative-caret-position="202">
+              <caret line="780" column="0" lean-forward="true" selection-start-line="780" selection-start-column="0" selection-end-line="780" selection-end-column="0" />
               <folding>
                 <element signature="e#484#514#0" expanded="true" />
                 <element signature="e#22394#23903#0" expanded="false" />
@@ -580,12 +580,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/01-17-upwork_master.py</url>
-          <line>778</line>
+          <line>779</line>
           <option name="timeStamp" value="150" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/01-17-upwork_master.py</url>
-          <line>782</line>
+          <line>784</line>
           <option name="timeStamp" value="151" />
         </line-breakpoint>
       </breakpoints>
@@ -900,8 +900,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/01-17-upwork_master.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="236">
-          <caret line="782" column="71" lean-forward="true" selection-start-line="782" selection-start-column="71" selection-end-line="782" selection-end-column="71" />
+        <state relative-caret-position="202">
+          <caret line="780" column="0" lean-forward="true" selection-start-line="780" selection-start-column="0" selection-end-line="780" selection-end-column="0" />
           <folding>
             <element signature="e#484#514#0" expanded="true" />
             <element signature="e#22394#23903#0" expanded="false" />

@@ -776,7 +776,9 @@ if __name__ == "__main__":
                 df2=dfout[num-1:num*25] #slice df
                 for p in proplist2:
                     try:
+                        p = p.split("\n")
                         name = p.split(' ',1)
+
                         fname=name[0]
                         lname=name[1][0] #first initial
                         name2=fname+" "+lname
