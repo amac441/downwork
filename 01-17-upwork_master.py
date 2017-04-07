@@ -36,10 +36,10 @@ import pandas as pd
 import time
 import datetime
 now = datetime.datetime.now()
-dater=now.year+"_"+now.month+"_"+now.day
+dater=str(now.year)+"_"+str(now.month)+"_"+str(now.day)
 
 #wr=open('output.csv','w')
-timestamp=datetime.now()
+#timestamp=datetime.now()
 path_to_chromedriver = r"chromedriver.exe"
 browser = webdriver.Chrome(executable_path = path_to_chromedriver)
 #======
@@ -444,11 +444,17 @@ def findMembers(df2,start,stop,messagetext,amount,create="T",negot='not negotiab
             time.sleep(2)
 
             #invite.click()
-            textbox=browser.find_element_by_xpath('//*[@id="interview-invitation-popup-message"]')
-            textbox.clear()
-            first=row['name'].split(" ",1)[0].title()
-            textbox.send_keys(messagetext % (first, negot, str(amount)))
-            time.sleep(1)
+            try:
+                textbox=browser.find_element_by_xpath('//*[@id="interview-invitation-popup-message"]')
+                textbox.clear()
+                first=row['name'].split(" ",1)[0].title()
+                textbox.send_keys(messagetext % (first, negot, str(amount)))
+                time.sleep(1)
+            except:
+                if create=="T":
+                    raw_input("Message Popup Not Sent")
+                else:
+                    print "Skipping it "+freeurl
 
             #SEND MESSAGE
             if create=="T":
@@ -516,21 +522,24 @@ def proposals(proplist,browser=browser):
         url=list[-1]
         name=prop.split(' ',1)[0]
         #get proposal URL
-        if url!='Withdrew':
-            browser.get(url)
-            time.sleep(2)
-            checkcaptcha()
-            amt=browser.find_element_by_xpath('//*[@id="layout"]/div[2]/div[2]/div/div/div[2]/div/div[1]/div[1]/div/div[1]/div[3]/h1').text
-            list.append(amt)
-            proplist[prop]=list
+        if url!='Withdrew' and "No Proposal" not in url:
+            try:
+                browser.get(url)
+                time.sleep(2)
+                checkcaptcha()
+                amt=browser.find_element_by_xpath('//*[@id="layout"]/div[2]/div[2]/div/div/div[2]/div/div[1]/div[1]/div/div[1]/div[3]/h1').text
+                list.append(amt)
+                proplist[prop]=list
+            except:
+                print "Reading Prop URL broken " + url
     return proplist
 
 def read_message(browser=browser,ms='',decline=False):
     url=r'https://www.upwork.com/messages/'
     browser.get(url)
-    time.sleep(1)
+    time.sleep(3)
     checkcaptcha()
-
+    time.sleep(2)
     proposals={}
     # //*[@id="room-nav"]/div[2]/div/div/div[3]/div/ul
     try:
@@ -541,6 +550,8 @@ def read_message(browser=browser,ms='',decline=False):
         try:
             table=browser.find_element_by_xpath('//*[@id="room-nav"]/div[2]/div/div/ul')
         except:
+            # try = browser.find_element_by_xpath('//*[@id="room-nav"]/div[2]/div/div/ul')
+
             print "No Interviews Table"
             sys.exit(1)
 
@@ -603,7 +614,7 @@ def read_message(browser=browser,ms='',decline=False):
             except:
                 proposal_url="No Proposal URL"
 
-            st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+            #st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
             #name
             #name=browser.find_element_by_xpath('//*[@id="story-box"]/div[1]/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div[2]/span')
 
@@ -667,7 +678,7 @@ if __name__ == "__main__":
         # with open(inputfile, ‘rb’) as f:
         # reader = csv.reader(f)
         # for row in reader:
-        mod=1
+        mod=11   #if mode less than 11
         dataframe=findMembers(dfresource,start,stop,invitemessagetext,amount,create,negot,mod)
 	
 		
@@ -741,7 +752,9 @@ if __name__ == "__main__":
         for index,row in input.iterrows():
             num=int(row['id'])
             if num!=0:
+
                 row=list(row)
+                print "Reading Input Row "+ str(num) + " " + str(row[1])
                 browser = webdriver.Chrome(executable_path = path_to_chromedriver)
                 params=[row[1],row[2]]
                 login(params,browser)
@@ -749,9 +762,16 @@ if __name__ == "__main__":
                     proplist=read_message(browser)
                     proplist2=proposals(proplist,browser)
                 except:
-                    raw_input('Retry? ')
-                    proplist=read_message(browser)
-                    proplist2=proposals(proplist,browser)
+                    try:
+                        raw_input('Retry? ')
+                        proplist=read_message(browser)
+                        proplist2=proposals(proplist,browser)
+                    except:
+                        print 'twice crashed - writing what we have'
+
+                propout = open('proput.txt','w')
+                propout.write(str(proplist2))
+                propout.close()
 
                 df2=dfout[num-1:num*25] #slice df
                 for p in proplist2:

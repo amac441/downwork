@@ -23,7 +23,7 @@ browser = webdriver.Chrome(executable_path = path_to_chromedriver)
 
 # list.find_element_by_class_name()
 
-f=open('manual_people/people_3.csv','w')
+f=open('manual_people/people_4_6.csv','w')
 # renamecolumns={'imageurl': 'portrait_50','profileurl': 'id','wage': 'rate','status': 'feedback','location': 'country'}
 # df2.head()
 f.write('imageurl;profileurl;name;title;description;wage;earned;status;location\n')
