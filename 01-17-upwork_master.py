@@ -38,10 +38,26 @@ import datetime
 now = datetime.datetime.now()
 dater=str(now.year)+"_"+str(now.month)+"_"+str(now.day)
 
+
+#==================
+fp = webdriver.FirefoxProfile()
+path_modify_header = 'modify_headers-0.7.1.1-fx.xpi'
+fp.add_extension(path_modify_header)
+fp.set_preference("modifyheaders.headers.count", 1)
+fp.set_preference("modifyheaders.headers.action0", "Add")
+fp.set_preference("modifyheaders.headers.name0", "nm") # Set here the name of the header
+fp.set_preference("modifyheaders.headers.value0", "vl") # Set here the value of the header
+fp.set_preference("modifyheaders.headers.enabled0", True)
+fp.set_preference("modifyheaders.config.active", True)
+fp.set_preference("modifyheaders.config.alwaysOn", True)
+
+browser = webdriver.Firefox(firefox_profile=fp)
+#==================
+
 #wr=open('output.csv','w')
 #timestamp=datetime.now()
 path_to_chromedriver = r"chromedriver.exe"
-browser = webdriver.Chrome(executable_path = path_to_chromedriver)
+#browser = webdriver.Firefox()  #Chrome(executable_path = path_to_chromedriver)
 #======
 #Submitting Job
 #======
@@ -525,7 +541,7 @@ def proposals(proplist,browser=browser):
         if url!='Withdrew' and "No Proposal" not in url:
             try:
                 browser.get(url)
-                time.sleep(2)
+                time.sleep(4)
                 checkcaptcha()
                 amt=browser.find_element_by_xpath('//*[@id="layout"]/div[2]/div[2]/div/div/div[2]/div/div[1]/div[1]/div/div[1]/div[3]/h1').text
                 list.append(amt)
@@ -730,7 +746,9 @@ if __name__ == "__main__":
             num=int(row['id'])
             if num!=0:
                 row=list(row)
-                browser = webdriver.Chrome(executable_path = path_to_chromedriver)
+                browser = webdriver.Firefox(firefox_profile=fp)
+
+                # browser = webdriver.Firefox()  #Chrome(executable_path = path_to_chromedriver)
                 params=[row[1],row[2]]
                 login(params,browser)
                 try:
@@ -755,7 +773,9 @@ if __name__ == "__main__":
 
                 row=list(row)
                 print "Reading Input Row "+ str(num) + " " + str(row[1])
-                browser = webdriver.Chrome(executable_path = path_to_chromedriver)
+                browser = webdriver.Firefox(firefox_profile=fp)
+
+                # browser = webdriver.Firefox()  #Chrome(executable_path = path_to_chromedriver)
                 params=[row[1],row[2]]
                 login(params,browser)
                 try:
@@ -776,8 +796,8 @@ if __name__ == "__main__":
                 df2=dfout[num-1:num*25] #slice df
                 for p in proplist2:
                     try:
-                        p = p.split("\n")
-                        name = p.split(' ',1)
+                        pr = p.split("\n")[1]
+                        name = pr.split(' ',1)
 
                         fname=name[0]
                         lname=name[1][0] #first initial

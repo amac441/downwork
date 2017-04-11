@@ -7,3 +7,5 @@ pyreadline==2.1
 selenium==3.0.2
 six==1.10.0
 urllib3==1.10
+#https://eveningsamurai.wordpress.com/2013/11/21/changing-http-headers-for-a-selenium-webdriver-request/
+#geckodriver
