@@ -1,40 +1,20 @@
 # initialize
 import time
+from datetime import datetime
+
 from selenium import webdriver
-import datetime
-now = datetime.datetime.now()
-dater=str(now.year)+"_"+str(now.month)+"_"+str(now.day)
+
 # wr=open('output.csv','w')
-
+timestamp = datetime.now()
 path_to_chromedriver = r"chromedriver.exe"
-
-chrome=raw_input("Chrome or Firefox? ")
-
-if chrome.lower()=="chrome":
-    browser = webdriver.Chrome(executable_path=path_to_chromedriver)
-else:
-    fp = webdriver.FirefoxProfile()
-    path_modify_header = 'modify_headers-0.7.1.1-fx.xpi'
-    fp.add_extension(path_modify_header)
-    fp.set_preference("modifyheaders.headers.count", 1)
-    fp.set_preference("modifyheaders.headers.action0", "Add")
-    fp.set_preference("modifyheaders.headers.name0", "nm") # Set here the name of the header
-    fp.set_preference("modifyheaders.headers.value0", "vl") # Set here the value of the header
-    fp.set_preference("modifyheaders.headers.enabled0", True)
-    fp.set_preference("modifyheaders.config.active", True)
-    fp.set_preference("modifyheaders.config.alwaysOn", True)
-    try:
-        browser = webdriver.Firefox(firefox_profile=fp)
-    except:
-        browser = webdriver.Firefox()
-
-browser.get('https://www.upwork.com')
+browser = webdriver.Chrome(executable_path=path_to_chromedriver)
+browser.get('http://www.upwork.com')
 # search
 # freelancer list
 
 # list.find_element_by_class_name()
 filename = raw_input("Log into upwork, set your search criteria, type your desired output filename and press enter")
-f = open('manual_people/%s_%s.csv' % (dater, filename), 'w')
+f = open('manual_people/%.csv' % filename, 'w')
 # renamecolumns={'imageurl': 'portrait_50','profileurl': 'id','wage': 'rate','status': 'feedback','location': 'country'}
 # df2.head()
 f.write('imageurl;profileurl;name;title;description;wage;earned;status;location\n')
@@ -81,7 +61,7 @@ while nextbutton == True:
                                          title.encode(encoding='UTF-8', errors='strict'),
                                          description.encode(encoding='UTF-8', errors='strict'), ";".join(detailsvals)))
     try:
-        child = browser.find_element_by_xpath('//a[contains(text(), "Next")]')
+        child = browser.find_element_by_xpath('//a[contains(text(), "Next ›")]')
         parent = child.find_element_by_xpath('..')
         # child.is_disabled
         classes = parent.get_attribute("class");
@@ -102,6 +82,3 @@ while nextbutton == True:
 
     count += 1
     print count
-
-
-print "Results are at " + 'manual_people/%s_%s.csv' % (dater, filename)

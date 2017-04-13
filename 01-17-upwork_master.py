@@ -40,6 +40,7 @@ dater=str(now.year)+"_"+str(now.month)+"_"+str(now.day)
 
 
 #==================
+
 fp = webdriver.FirefoxProfile()
 path_modify_header = 'modify_headers-0.7.1.1-fx.xpi'
 fp.add_extension(path_modify_header)
@@ -50,8 +51,8 @@ fp.set_preference("modifyheaders.headers.value0", "vl") # Set here the value of 
 fp.set_preference("modifyheaders.headers.enabled0", True)
 fp.set_preference("modifyheaders.config.active", True)
 fp.set_preference("modifyheaders.config.alwaysOn", True)
-
 browser = webdriver.Firefox(firefox_profile=fp)
+
 #==================
 
 #wr=open('output.csv','w')
