@@ -340,9 +340,10 @@ def findMembers(df2,start,stop,messagetext,amount,create="T",negot='not negotiab
     df['scraped_rate']=''
     df['language']=''
     df['college']=''
+    df['country']=''
 
     f=open('catcherrors.txt','w')
-    f.write("url,worked,jobs,earned,accolade,success,availability,messaged,job_in_progress,scraped_rate,language,college")
+    f.write("url,worked,jobs,earned,accolade,success,availability,messaged,job_in_progress,scraped_rate,language,college,country")
     count=0
 
     for index, row in df.iterrows():
@@ -489,7 +490,10 @@ def findMembers(df2,start,stop,messagetext,amount,create="T",negot='not negotiab
             else:
                 df.set_value(index,'messaged',"NA")
 
-
+            try:
+                country=browser.find_element_by_xpath("//span[@itemprop='country-name']").text
+            except:
+                country=''
 
             # if prognum==0:
             #     progrum=''
@@ -507,6 +511,7 @@ def findMembers(df2,start,stop,messagetext,amount,create="T",negot='not negotiab
             df.set_value(index,'job_in_progress',prognum)
             df.set_value(index,'language',str(language))
             df.set_value(index,'college',college)
+            df.set_value(index,'country',country)
 
             try:
                 f.write(",".join([freeurl,worked,jobs,earned,rising,success,availtext,rate,str(prognum),language,college]))
@@ -536,8 +541,8 @@ def proposals(proplist,browser=browser):
     for prop in proplist:
         time.sleep(1)
         list = proplist[prop]
-        url=list[-1]
-        name=prop.split(' ',1)[0]
+        url=list[-2]
+        name=list[-1].split(' ',1)[0]
         #get proposal URL
         if url!='Withdrew' and "No Proposal" not in url:
             try:
@@ -620,6 +625,7 @@ def read_message(browser=browser,ms='',decline=False):
 
         #messages=browser.find_element_by_xpath('//*[@id="story-box"]/div[1]/div/div[2]/div[2]/div')
         try:
+
             textdiv=browser.find_element_by_xpath('//*[@id="story-box"]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div/div/div[3]/div/div/div/div/div/div/span')
             # messagedate=...
             messagetime=browser.find_element_by_xpath('//*[@id="story-box"]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div/div/span/a/span').get_attribute('title')
@@ -631,13 +637,22 @@ def read_message(browser=browser,ms='',decline=False):
             except:
                 proposal_url="No Proposal URL"
 
-            #st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-            #name
-            #name=browser.find_element_by_xpath('//*[@id="story-box"]/div[1]/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div[2]/span')
+
+            #get profile URL
+            namediv=browser.find_elements_by_xpath("//div[@class='story-wrapper']")[-1]
+            namediv.find_element_by_tag_name('eo-story-header').click()
+            time.sleep(2)
+            dr = browser.find_element_by_class_name('dropdown-menu')
+            profileA = dr.find_elements_by_xpath("//li[@ng-if='user.profile']")
+            for link in profileA:
+                try:
+                    profile_url = link.find_element_by_tag_name('a').get_attribute('href')
+                except:
+                    pass
 
             #{Name:[data],Name:[data]}
             try:
-                proposals[name]=[name,messagetime,message,proposal_url]
+                proposals[profile_url]=[name,messagetime,message,proposal_url,name]
             except:
                 proposals={}
         except:
@@ -681,7 +696,7 @@ if __name__ == "__main__":
     #1 details <file>
     #====================================
     if type=='details':
-        params=['low.jennifer.miller0921@gmail.com','ra123456.']
+        params=['ellywood06@gmail.com','kRCdWssNT3']
         login(params)
         count=1
         dfresource=pd.read_csv(inputfile)
@@ -769,7 +784,12 @@ if __name__ == "__main__":
         # _, last = row_iterator.next()  # take first item from row_iterator
 
         for index,row in input.iterrows():
-            num=int(row['id'])
+
+            try:
+                num=int(row['id'])
+            except:
+                num=0
+
             if num!=0:
 
                 row=list(row)
@@ -797,16 +817,15 @@ if __name__ == "__main__":
                 df2=dfout[num-1:num*25] #slice df
                 for p in proplist2:
                     try:
-                        pr = p.split("\n")[1]
-                        name = pr.split(' ',1)
-
-                        fname=name[0]
-                        lname=name[1][0] #first initial
-                        name2=fname+" "+lname
-                        dfindex=df2[df2.name.str.contains(name2)].index
+                        # pr = p.split("\n")[1]
+                        # name = pr.split(' ',1)
+                        # fname=name[0]
+                        # lname=name[1][0] #first initial
+                        # name2=fname+" "+lname
+                        dfindex=df2[df2.id.str.contains(p)].index
                         dfout.loc[dfindex,'MessageTime']=proplist[p][1]
                         dfout.loc[dfindex,'MessageText']=proplist[p][2] #text
-                        dfout.loc[dfindex,'ProposalAmount']=proplist[p][4] #amount
+                        dfout.loc[dfindex,'ProposalAmount']=proplist[p][5] #amount
                         a=1
                     except:
                         pass
