@@ -76,11 +76,13 @@ while nextbutton == True:
             t = d.text.strip()
             # print(t)
             detailsvals.append(t)
+        try:
+            f.write('%s;%s;%s;%s;%s;%s\n' % (imageurl, profileurl, name.encode(encoding='UTF-8', errors='strict'),
+                                             title.encode(encoding='UTF-8', errors='strict'),
+                                             description.encode(encoding='UTF-8', errors='strict'), ";".join(detailsvals)))
+        except:
+            f.write('%s;%s;"name_error"\n' % (imageurl, profileurl)
 
-        f.write('%s;%s;%s;%s;%s;%s\n' % (imageurl, profileurl, name.encode(encoding='UTF-8', errors='strict'),
-                                         title.encode(encoding='UTF-8', errors='strict'),
-                                         description.encode(encoding='UTF-8', errors='strict'), ";".join(detailsvals)))
-    try:
         child = browser.find_element_by_xpath('//a[contains(text(), "Next")]')
         parent = child.find_element_by_xpath('..')
         # child.is_disabled
