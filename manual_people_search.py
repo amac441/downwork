@@ -65,7 +65,10 @@ while nextbutton == True:
 
         title = content.find_element_by_tag_name('strong').text
         # print(name,profileurl,title)
-        print name
+        try:
+            print name
+        except:
+            print "Can't Display Name"
         description = content.find_element_by_xpath('//p[@data-qa="tile_description"]').text
         # print(description)
 
