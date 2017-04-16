@@ -77,9 +77,13 @@ while nextbutton == True:
             # print(t)
             detailsvals.append(t)
 
-        f.write('%s;%s;%s;%s;%s;%s\n' % (imageurl, profileurl, name.encode(encoding='UTF-8', errors='strict'),
+        try:
+            f.write('%s;%s;%s;%s;%s;%s\n' % (imageurl, profileurl, name.encode(encoding='UTF-8', errors='strict'),
                                          title.encode(encoding='UTF-8', errors='strict'),
                                          description.encode(encoding='UTF-8', errors='strict'), ";".join(detailsvals)))
+        except:
+            f.write('%s;%s;"name_error"\n' % (imageurl, profileurl))
+
     try:
         child = browser.find_element_by_xpath('//a[contains(text(), "Next")]')
         parent = child.find_element_by_xpath('..')
