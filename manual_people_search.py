@@ -33,7 +33,7 @@ browser.get('https://www.upwork.com')
 # freelancer list
 
 # list.find_element_by_class_name()
-filename = raw_input("Log into upwork, set your search criteria, type your desired output filename and press enter")
+filename = raw_input("Log into upwork, set your search criteria, type your desired output filename and press enter ")
 f = open('manual_people/%s_%s.csv' % (dater, filename), 'w')
 # renamecolumns={'imageurl': 'portrait_50','profileurl': 'id','wage': 'rate','status': 'feedback','location': 'country'}
 # df2.head()
@@ -79,8 +79,8 @@ while nextbutton == True:
 
         try:
             f.write('%s;%s;%s;%s;%s;%s\n' % (imageurl, profileurl, name.encode(encoding='UTF-8', errors='strict'),
-                                         title.encode(encoding='UTF-8', errors='strict'),
-                                         description.encode(encoding='UTF-8', errors='strict'), ";".join(detailsvals)))
+                                             title.encode(encoding='UTF-8', errors='strict'),
+                                             description.encode(encoding='UTF-8', errors='strict'), ";".join(detailsvals)))
         except:
             f.write('%s;%s;"name_error"\n' % (imageurl, profileurl))
 
