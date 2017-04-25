@@ -46,8 +46,8 @@ path_modify_header = 'modify_headers-0.7.1.1-fx.xpi'
 fp.add_extension(path_modify_header)
 fp.set_preference("modifyheaders.headers.count", 1)
 fp.set_preference("modifyheaders.headers.action0", "Add")
-fp.set_preference("modifyheaders.headers.name0", "nm") # Set here the name of the header
-fp.set_preference("modifyheaders.headers.value0", "vl") # Set here the value of the header
+fp.set_preference("modifyheaders.headers.name0", "firefox") # Set here the name of the header
+fp.set_preference("modifyheaders.headers.value0", "20.1") # Set here the value of the header
 fp.set_preference("modifyheaders.headers.enabled0", True)
 fp.set_preference("modifyheaders.config.active", True)
 fp.set_preference("modifyheaders.config.alwaysOn", True)
@@ -106,7 +106,9 @@ def login(params,browser=browser):
     pw=browser.find_element_by_id('login_password')
     pw.send_keys(password)
     #click
-    browser.find_element_by_tag_name('button').click()
+    time.sleep(5)
+
+    #browser.find_element_by_tag_name('button').click()
 
     checkcaptcha(params)
 
@@ -423,22 +425,31 @@ def findMembers(df2,start,stop,messagetext,amount,create="T",negot='not negotiab
             #in progress
             prognum=0
             try:
-                progstr=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/div[2]').text
-                if progstr=='':
-                    a=b
-
-                prognum=int(progstr.split(" ",1)[0])
-
-            except:
                 try:
-                    jobsdiv=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/ul')
-                    jd=jobsdiv.find_elements_by_tag_name('li')
-                    for j in jd:
-                        prog=j.find_element_by_tag_name('em').text
-                        if "in progress" in prog:
-                            prognum+=1
+                    progstr=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/div[2]').text
+                    if progstr=='':
+                        a=b
+
+                    prognum=int(progstr.split(" ",1)[0])
+
                 except:
-                    pass
+                    try:
+                        jobsdiv=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/ul')
+
+                    except:
+                        try:
+                            jobsdiv=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/div[2]/div/ul')
+
+                        except:
+                            pass
+
+                jd=jobsdiv.find_elements_by_tag_name('li')
+                for j in jd:
+                    prog=j.find_element_by_tag_name('em').text
+                    if "in progress" in prog:
+                        prognum+=1
+            except:
+                print ("Error getting Jobs in Progress")
 
             college = ''
             try:

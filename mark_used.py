@@ -18,4 +18,4 @@ for u in used_list:
     df2=df[cols]
     dfused=dfused.append(df2)
 
-df5=resourceslist.merge(url3,on=['id'],how="left")
+df3=df2.merge(dfused,on=['id'],how="left")
