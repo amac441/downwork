@@ -3,6 +3,8 @@ import numpy as np
 import sys
 
 # rs=pd.read_csv(r"C:\Users\amac\Documents\Development\0117-DaiAnalysis\Upwork\manual_people\2017_4_24_andy.csv",encoding = "ISO-8859-1", delimiter=";",error_bad_lines=False)
+
+
 file=sys.argv[2]
 rs=pd.read_csv(file,encoding = "ISO-8859-1", delimiter=";",error_bad_lines=False)
 

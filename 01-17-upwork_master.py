@@ -51,8 +51,10 @@ fp.set_preference("modifyheaders.headers.value0", "20.1") # Set here the value o
 fp.set_preference("modifyheaders.headers.enabled0", True)
 fp.set_preference("modifyheaders.config.active", True)
 fp.set_preference("modifyheaders.config.alwaysOn", True)
-browser = webdriver.Firefox(firefox_profile=fp)
 
+
+brow=raw_input("Firefox or Chrome ")
+browser=''
 #==================
 
 #wr=open('output.csv','w')
@@ -100,15 +102,21 @@ def login(params,browser=browser):
     #CheckBox.click()
     username=params[0]
     password=params[1]
-    ui.WebDriverWait(browser, 60).until(EC.visibility_of_element_located((By.ID, "login_username")))
-    id=browser.find_element_by_id('login_username')
-    id.send_keys(username)
-    pw=browser.find_element_by_id('login_password')
-    pw.send_keys(password)
+    try:
+        ui.WebDriverWait(browser, 60).until(EC.visibility_of_element_located((By.ID, "login_username")))
+        id=browser.find_element_by_id('login_username')
+        id.send_keys(str(username))
+        pw=browser.find_element_by_id('login_password')
+        pw.send_keys(str(password))
+        time.sleep(2)
+    except:
     #click
-    time.sleep(5)
+        raw_input("Press enter when you have entered your login credentials")
 
-    #browser.find_element_by_tag_name('button').click()
+    try:
+        browser.find_element_by_tag_name('button').click()
+    except:
+        time.sleep(5)
 
     checkcaptcha(params)
 
@@ -295,13 +303,9 @@ def create_job(amount,create='T',negot="not negotiable"):
 #post job popup
 #/html/body/div[5]/div/div/div[2]/div[2]/div/label/span
 
-def progress():
-    progs=[]
-    urls=open('urls.txt','r')
-    for url in urls:
-        browser.get(url.replace("\n",''))
-        time.sleep(3)
-        prognum=0
+def getprogress():
+    prognum=0
+    try:
         try:
             progstr=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/div[2]').text
             if progstr=='':
@@ -311,20 +315,42 @@ def progress():
 
         except:
             try:
-                                                       #//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/ul                                                   #//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/ul
-                jobsdiv=browser.find_element_by_class_name("list-unstyled")
-                #jobsdiv=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/ul')
+                jobsdiv=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/ul')
                 jd=jobsdiv.find_elements_by_tag_name('li')
                 for j in jd:
                     prog=j.find_element_by_tag_name('em').text
-                    if "Job in progress" in prog:
+                    if "in progress" in prog:
                         prognum+=1
             except:
-                pass
+                try:
+                    jobsdiv=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/div[2]/div/ul')
+                    jd=jobsdiv.find_elements_by_tag_name('li')
+                    for j in jd:
+                        prog=j.find_element_by_tag_name('em').text
+                        if "in progress" in prog:
+                            prognum+=1
+                except:
+                    pass
+
+    except:
+        print ("Error getting Jobs in Progress")
+
+    return prognum
+
+def progress(df):
+    progs=[]
+    for index, row in df.iterrows():
+
+        #print row['c1'], row['c2']
+        url=row['id']
+
+        browser.get(url.replace("\n",''))
+        time.sleep(3)
+        prognum=0
+        prognum=getprogress()
 
         progs.append(prognum)
 
-    urls.close()
     return progs
 
 #search members from list
@@ -424,32 +450,7 @@ def findMembers(df2,start,stop,messagetext,amount,create="T",negot='not negotiab
 
             #in progress
             prognum=0
-            try:
-                try:
-                    progstr=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/div[2]').text
-                    if progstr=='':
-                        a=b
-
-                    prognum=int(progstr.split(" ",1)[0])
-
-                except:
-                    try:
-                        jobsdiv=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/ul')
-
-                    except:
-                        try:
-                            jobsdiv=browser.find_element_by_xpath('//*[@id="oProfilePage"]/div[1]/div[2]/o-profile-assignments/div/div/div[2]/div/ul')
-
-                        except:
-                            pass
-
-                jd=jobsdiv.find_elements_by_tag_name('li')
-                for j in jd:
-                    prog=j.find_element_by_tag_name('em').text
-                    if "in progress" in prog:
-                        prognum+=1
-            except:
-                print ("Error getting Jobs in Progress")
+            prognum=getprogress()
 
             college = ''
             try:
@@ -483,7 +484,7 @@ def findMembers(df2,start,stop,messagetext,amount,create="T",negot='not negotiab
                 if create=="T":
                     raw_input("Message Popup Not Sent")
                 else:
-                    print "Skipping it "+freeurl
+                    print "Did Not Message "+freeurl
 
             #SEND MESSAGE
             if create=="T":
@@ -554,6 +555,7 @@ def proposals(proplist,browser=browser):
         list = proplist[prop]
         url=list[-2]
         name=list[-1].split(' ',1)[0]
+        print (name)
         #get proposal URL
         if url!='Withdrew' and "No Proposal" not in url:
             try:
@@ -570,10 +572,49 @@ def proposals(proplist,browser=browser):
 def read_message(browser=browser,ms='',decline=False):
     url=r'https://www.upwork.com/messages/'
     browser.get(url)
-    time.sleep(3)
+    time.sleep(1)
     checkcaptcha()
     time.sleep(2)
     proposals={}
+
+    # #new method
+    # #find table
+    # data-ng-if="openings.length"
+    #
+    # #click this
+    # data-event="click_view_job_via_title"
+    #
+    # #proposals page
+    # //*[@id="application"]/div[2]/div/div[2]/div/div/a[3]/span
+    #
+    # #click show more
+    # //*[@id="application"]/div[4]/proposals/div/div/div/div/div/applicants-tab/div/div/div[2]/div/div/div[2]/section/show-more/div/button/span
+    # data-ng-click="$ctrl.showMore(folder)"
+    #
+    # #cycle through
+    # //*[@id="application"]/div[4]/proposals/div/div/div/div/div/applicants-tab/div/div/div[2]
+    #
+    # #click them
+    # class="freelancer-tile-name"
+    #
+    # #get amount
+    # /html/body/div[3]/div[1]/div/div[2]/div/div[1]/div[1]/div/div[1]/div[3]/h1
+    #
+    # #get message
+    # class="viewport"
+    # #within viewport
+    # class="story-message"
+    # #get last one and time
+    #
+    # #get time
+    #
+    # #close this (then continue reading?)
+    # /html/body/div[3]/div[2]/div
+    #
+            # try:
+            #     proposal_url=browser.find_element_by_xpath('//*[@id="room-chat-nav"]/div[3]/button')
+            # except:
+
     # //*[@id="room-nav"]/div[2]/div/div/div[3]/div/ul
     try:
         table=browser.find_element_by_xpath('*[@id="room-main-body"]/div[2]/ui-view/div/table/tbody')
@@ -586,6 +627,7 @@ def read_message(browser=browser,ms='',decline=False):
             # try = browser.find_element_by_xpath('//*[@id="room-nav"]/div[2]/div/div/ul')
 
             print "No Interviews Table"
+            browser.close()
             sys.exit(1)
 
     #interview=browser.find_element_by_xpath('*[@id="room-nav"]/div[2]/div/div/div[3]/div')
@@ -593,9 +635,10 @@ def read_message(browser=browser,ms='',decline=False):
 
     for item in table.find_elements_by_tag_name('li'):
         name=item.find_element_by_class_name('room-list-name-span').text
+        print (name)
         fname=name.split("\n",1)[1]
         item.click()
-        time.sleep(2)
+        time.sleep(4)
 
         if decline==True:
             name=fname.split(' ',1)[0]
@@ -614,10 +657,14 @@ def read_message(browser=browser,ms='',decline=False):
                 try:
                     msgb=browser.find_element_by_class_name('msg-composer-area')
                     msgbox=msgb.find_element_by_tag_name("textarea")
+                    msgbox.click()
+                    msgbox.clear()
                     msgbox.send_keys(mes)
                 except:
                     try:
                         msgbox=browser.find_element_by_class_name('msg-composer-input')
+                        msgbox.click()
+                        msgbox.clear()
                         msgbox.send_keys(mes)
                     except:
                         pass
@@ -646,30 +693,58 @@ def read_message(browser=browser,ms='',decline=False):
             try:
                 proposal_url=textdiv.find_element_by_tag_name('a').get_attribute("href")
             except:
-                proposal_url="No Proposal URL"
+                try:
+                    print ("Getting URL From Tab")
+                    browser.find_element_by_xpath('//*[@id="room-chat-nav"]/div[3]/button[2]').click()
+                    handles = browser.window_handles
+                    browser.switch_to.window(handles[-1])
+                    proposal_url=browser.current_url
+                    browser.switch_to.window(handles[0])
+                except:
+                    print ("Retrieve Proposal UrL manually")
+                    proposal_url="No Proposal URL"
 
 
             #get profile URL
-            namediv=browser.find_elements_by_xpath("//div[@class='story-wrapper']")[-1]
-            namediv.find_element_by_tag_name('eo-story-header').click()
+
+            profile_url=None
+            #namediv=browser.find_elements_by_xpath("//div[@class='story-wrapper']")[-1]
+            # namediv.find_element_by_tag_name('eo-story-header').click()
+            time.sleep(1)
+            # browser.find_elements_by_xpath("//span[@ng-if='user.info.fullName']")[-1].click()
+            # browser.find_elements_by_xpath('//div[@class="story-author"]')[-1].click()
+            browser.find_elements_by_class_name("story-icon")[-1].click()
             time.sleep(2)
             dr = browser.find_element_by_class_name('dropdown-menu')
             profileA = dr.find_elements_by_xpath("//li[@ng-if='user.profile']")
+
             for link in profileA:
                 try:
                     profile_url = link.find_element_by_tag_name('a').get_attribute('href')
                 except:
                     pass
 
+            if profile_url==None:
+                print ("====No Profile URL=====")
+
             #{Name:[data],Name:[data]}
             try:
                 proposals[profile_url]=[name,messagetime,message,proposal_url,name]
             except:
-                proposals={}
+                print("No Pofile URL - " + name)
         except:
             pass
 
     return proposals
+
+def changeencode(data):
+    cols=list(data.columns.values)
+    for col in cols:
+        try:
+            data[col] = data[col].str.decode('iso-8859-1').str.encode('utf-8')
+        except:
+            pass
+    return data
 
 import csv
 import os
@@ -683,6 +758,7 @@ if __name__ == "__main__":
         number = sys.argv[1]
     except:
         print "Provide inputs: [number - specifying which accounts to go after] [optional: runtype (create,iterate,read-T,F)] [optional:inputfile location] [optional: splitby - how many rows to read]"
+        browser.close()
         sys.exit(1)
 
     try:
@@ -703,34 +779,6 @@ if __name__ == "__main__":
         print ("Using Input.csv")
         inputfile="input.csv"
 
-    #====================================
-    #1 details <file>
-    #====================================
-    if type=='details':
-        params=['ellywood06@gmail.com','kRCdWssNT3']
-        login(params)
-        count=1
-        dfresource=pd.read_csv(inputfile)
-        start=0
-        stop=2000
-        invitemessagetext="test %s %s %s"
-        amount=10
-        create='F'
-        negot='F'
-
-        # with open(inputfile, ‘rb’) as f:
-        # reader = csv.reader(f)
-        # for row in reader:
-        mod=11   #if mode less than 11
-        dataframe=findMembers(dfresource,start,stop,invitemessagetext,amount,create,negot,mod)
-	
-		
-        dataframe.to_csv(dater+"_manual_details.csv")
-        raw_input("Done with Details")
-        browser.close()
-        sys.exit(0)
-
-
     # inputcsv = open(inputfile,'r')
     # input = csv.reader(inputcsv)
     # next(input, None)  # skip the headers
@@ -740,6 +788,7 @@ if __name__ == "__main__":
     baseline=input[input.id==int(0)].values.tolist()[0]
     params=[userow[1],userow[2]]
     amount=str(userow[3])
+
 
     invitemessagetext=userow[4].encode('utf-8')
     if invitemessagetext.lower()=="same":
@@ -757,6 +806,53 @@ if __name__ == "__main__":
 
     invitemessagetext='''Hello %s!\nI'd like to invite you to apply to my job that entails writing a blog article (800-1000 words; ~5 hours). Please review the job post and apply if you're available.\n--Suggested hourly rate: $18 (It is %s)\n--Average hourly rate I have paid on Upwork: $%s\nJennifer'''
 
+
+    #====================================
+    #1 details <file>
+    #====================================
+    if type=='details':
+
+        if 'fire' in brow.lower():
+            browser = webdriver.Firefox(firefox_profile=fp)
+        else:
+            browser = webdriver.Chrome(executable_path = path_to_chromedriver)
+
+        params=['ellywood06@gmail.com','kRCdWssNT3']
+        login(params)
+        count=1
+        dfresource=pd.read_csv(file)
+        start=0
+        stop=2000
+        invitemessagetext="test %s %s %s"
+        amount=10
+        create='F'
+        negot='F'
+        # with open(inputfile, ‘rb’) as f:
+        # reader = csv.reader(f)
+        # for row in reader:
+        mod=11   #if mode less than 11
+        dataframe=findMembers(dfresource,start,stop,invitemessagetext,amount,create,negot,mod)
+        dataframe.to_csv(dater+"_manual_details.csv")
+        raw_input("Done with Details")
+        browser.close()
+        sys.exit(0)
+    elif type=='progress':
+
+        if 'fire' in brow.lower():
+            browser = webdriver.Firefox(firefox_profile=fp)
+        else:
+            browser = webdriver.Chrome(executable_path = path_to_chromedriver)
+
+        params=['ellywood06@gmail.com','kRCdWssNT3']
+        login(params)
+        df=pd.read_csv(file)
+        data=progress(df)
+        f=open('progout.txt','w')
+        f.write(str(data))
+        f.close()
+        browser.close()
+        sys.exit(0)
+
     dfresource=pd.read_csv(file)
 
     start=(int(number)-1)*25
@@ -773,9 +869,11 @@ if __name__ == "__main__":
             num=int(row['id'])
             if num!=0:
                 row=list(row)
-                browser = webdriver.Firefox(firefox_profile=fp)
+                if 'fire' in brow.lower():
+                    browser = webdriver.Firefox(firefox_profile=fp)
+                else:
+                    browser = webdriver.Chrome(executable_path = path_to_chromedriver)
 
-                # browser = webdriver.Firefox()  #Chrome(executable_path = path_to_chromedriver)
                 params=[row[1],row[2]]
                 login(params,browser)
                 try:
@@ -805,9 +903,12 @@ if __name__ == "__main__":
 
                 row=list(row)
                 print "Reading Input Row "+ str(num) + " " + str(row[1])
-                browser = webdriver.Firefox(firefox_profile=fp)
 
-                # browser = webdriver.Firefox()  #Chrome(executable_path = path_to_chromedriver)
+                if 'fire' in brow.lower():
+                    browser = webdriver.Firefox(firefox_profile=fp)
+                else:
+                    browser = webdriver.Chrome(executable_path = path_to_chromedriver)
+
                 params=[row[1],row[2]]
                 login(params,browser)
                 try:
@@ -833,7 +934,7 @@ if __name__ == "__main__":
                         # fname=name[0]
                         # lname=name[1][0] #first initial
                         # name2=fname+" "+lname
-                        dfindex=df2[df2.id.str.contains(p)].index
+                        dfindex=df2[df2.profileid.str.contains("'"+p.split('~')[1])].index
                         dfout.loc[dfindex,'MessageTime']=proplist[p][1]
                         dfout.loc[dfindex,'MessageText']=proplist[p][2] #text
                         dfout.loc[dfindex,'ProposalAmount']=proplist[p][5] #amount
@@ -842,19 +943,29 @@ if __name__ == "__main__":
                         pass
                 browser.close()
 
+        dfout= changeencode(dfout)
         try:
             dfout.to_csv(dater+"Final_"+outfile+".csv",encoding='utf-8')
         except:
             dfout.to_csv(dater+"Final_"+outfile+".csv",sep='\t',encoding='utf-8')
 
-    elif type=='progress':
-        login(params)
-        data=progress()
-        f=open('progout.txt','w')
-        f.write(str(data))
-        f.close()
+        sys.exit(0)
 
-    elif type=="submit" or type=="create":
+#==================================
+
+#Old sumbission stuff
+
+#==================================
+
+    if 'fire' in brow.lower():
+        browser = webdriver.Firefox(firefox_profile=fp)
+    else:
+        browser = webdriver.Chrome(executable_path = path_to_chromedriver)
+
+
+    if type=="submit" or type=="create":
+
+
         login(params)
         if type=="create":
             create_job(amount,create,negot)
@@ -878,8 +989,6 @@ if __name__ == "__main__":
         f.write(str(proplist2))
         f.close()
         #read responses
-
-
 
     raw_input("Press Enter to close browser ")
     browser.close()
