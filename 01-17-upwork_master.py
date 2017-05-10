@@ -555,6 +555,21 @@ def proposals(proplist,browser=browser):
 # Read the messages from accepted freelancers
 #=======================================
 
+def get_profile_url(browser):
+    browser.find_elements_by_class_name("story-icon")[-1].click()
+    time.sleep(2)
+    dr = browser.find_element_by_class_name('dropdown-menu')
+    profileA = dr.find_elements_by_xpath("//li[@ng-if='user.profile']")
+
+    for link in profileA:
+        try:
+            profile_url = link.find_element_by_tag_name('a').get_attribute('href')
+        except:
+            pass
+
+    return profile_url
+
+
 def read_message(browser=browser,ms='',decline=False):
     url=r'https://www.upwork.com/messages/'
     browser.get(url)
@@ -652,19 +667,14 @@ def read_message(browser=browser,ms='',decline=False):
             time.sleep(1)
             # browser.find_elements_by_xpath("//span[@ng-if='user.info.fullName']")[-1].click()
             # browser.find_elements_by_xpath('//div[@class="story-author"]')[-1].click()
-            browser.find_elements_by_class_name("story-icon")[-1].click()
-            time.sleep(2)
-            dr = browser.find_element_by_class_name('dropdown-menu')
-            profileA = dr.find_elements_by_xpath("//li[@ng-if='user.profile']")
-
-            for link in profileA:
-                try:
-                    profile_url = link.find_element_by_tag_name('a').get_attribute('href')
-                except:
-                    pass
+            profile_url=get_profile_url(browser)
 
             if profile_url==None:
-                print ("====No Profile URL=====")
+                time.sleep(3)
+                profile_url=get_profile_url(browser)
+
+                if profile_url==None:
+                    print ("==== No Profile URL.  Get Manually For %s =====" % name)
 
             #{Name:[data],Name:[data]}
             try:

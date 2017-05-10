@@ -56,56 +56,61 @@ while nextbutton == True:
 
     for p in people:
 
-        image = p.find_element_by_class_name('col-md-10')
-        div = image.find_element_by_tag_name('div')
-        # driver.find_element_by_xpath('//input[@node-type="searchInput"]')
-        # driver.find_elements_by_xpath('.//span[contains(text(), "Author")]/a')
-        # print('------')
-        imageurl = div.get_attribute('data-photo-url')
-        # print(imageurl)
-
-        content = p.find_element_by_class_name('col-md-9')
-        namediv = content.find_element_by_tag_name('a')
         try:
-            name = namediv.text.decode('utf-8', 'ignore')
-        except:
-            name=''
+            image = p.find_element_by_class_name('col-md-10')
+            div = image.find_element_by_tag_name('div')
+            # driver.find_element_by_xpath('//input[@node-type="searchInput"]')
+            # driver.find_elements_by_xpath('.//span[contains(text(), "Author")]/a')
+            # print('------')
+            imageurl = div.get_attribute('data-photo-url')
+            # print(imageurl)
 
-        profileurl = namediv.get_attribute('href')
+            content = p.find_element_by_class_name('col-md-9')
+            namediv = content.find_element_by_tag_name('a')
 
-        try:
-            title = content.find_element_by_tag_name('strong').text.decode('utf-8', 'ignore')
-        except:
-            title=''
-        # print(name,profileurl,title)
-        try:
-            print name
-        except:
-            print "Can't Display Name"
+            try:
+                name = namediv.text.decode('utf-8', 'ignore')
+            except:
+                name=''
 
-        try:
-            # description = content.find_element_by_xpath('//p[@data-qa="tile_description"]').text.decode('utf-8', 'ignore')
-            # p-0-left
-            description=''
-            description = content.find_element_by_class_name('p-0-left').text.decode('utf-8', 'ignore')
-        except:
-            description = ''
-        # print(description)
+            profileurl = namediv.get_attribute('href')
 
-        details = content.find_element_by_class_name('m-0-bottom')
-        detailslist = ['wage', 'earned', 'success(opt)', 'location']
-        detailsvals = []
-        for d in details.find_elements_by_class_name('col-md-3'):
-            t = d.text.strip().decode('utf-8', 'ignore')
-            # print(t)
-            detailsvals.append(t)
+            try:
+                title = content.find_element_by_tag_name('strong').text.decode('utf-8', 'ignore')
+            except:
+                title=''
+            # print(name,profileurl,title)
+            try:
+                print name
+            except:
+                print "Can't Display Name"
 
-        try:
-            f.write('%s;%s;%s;%s;%s;%s\n' % (imageurl, profileurl, name.encode(encoding='UTF-8', errors='strict'),
-                                             title.encode(encoding='UTF-8', errors='strict'),
-                                             description.encode(encoding='UTF-8', errors='strict'), ";".join(detailsvals)))
+            try:
+                # description = content.find_element_by_xpath('//p[@data-qa="tile_description"]').text.decode('utf-8', 'ignore')
+                # p-0-left
+                description=''
+                description = content.find_element_by_class_name('p-0-left').text.decode('utf-8', 'ignore')
+            except:
+                description = ''
+            # print(description)
+
+            details = content.find_element_by_class_name('m-0-bottom')
+            detailslist = ['wage', 'earned', 'success(opt)', 'location']
+            detailsvals = []
+            for d in details.find_elements_by_class_name('col-md-3'):
+                t = d.text.strip().decode('utf-8', 'ignore')
+                # print(t)
+                detailsvals.append(t)
+
+            try:
+                f.write('%s;%s;%s;%s;%s;%s\n' % (imageurl, profileurl, name.encode(encoding='UTF-8', errors='strict'),
+                                                 title.encode(encoding='UTF-8', errors='strict'),
+                                                 description.encode(encoding='UTF-8', errors='strict'), ";".join(detailsvals)))
+            except:
+                f.write('%s;%s;"name_error"\n' % (imageurl, profileurl))
+
         except:
-            f.write('%s;%s;"name_error"\n' % (imageurl, profileurl))
+            pass
 
     #==============================
     # click next
