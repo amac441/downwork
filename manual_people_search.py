@@ -46,8 +46,13 @@ while nextbutton == True:
     time.sleep(1)
     # //*[@id="layout"]/div[2]/div[2]/div/div/div/div/div/div[1]/div/freelancers-search/div/div[2]
     # list=browser.find_element_by_xpath('//*[@id="layout"]/div[2]/div[2]/div/div/div/div/div/div[1]/div/freelancers-search/div/div[2]')
-    list = browser.find_element_by_class_name('ats-applicants')
-    people = list.find_elements_by_tag_name('article')
+    try:
+        list = browser.find_element_by_class_name('ats-applicants')
+        people = list.find_elements_by_tag_name('article')
+    except:
+        list = browser.find_element_by_class_name('air-card-sm')
+        people = list.find_elements_by_tag_name('section')
+
 
     for p in people:
 
@@ -79,7 +84,10 @@ while nextbutton == True:
             print "Can't Display Name"
 
         try:
-            description = content.find_element_by_xpath('//p[@data-qa="tile_description"]').text.decode('utf-8', 'ignore')
+            # description = content.find_element_by_xpath('//p[@data-qa="tile_description"]').text.decode('utf-8', 'ignore')
+            # p-0-left
+            description=''
+            description = content.find_element_by_class_name('p-0-left').text.decode('utf-8', 'ignore')
         except:
             description = ''
         # print(description)
@@ -98,6 +106,10 @@ while nextbutton == True:
                                              description.encode(encoding='UTF-8', errors='strict'), ";".join(detailsvals)))
         except:
             f.write('%s;%s;"name_error"\n' % (imageurl, profileurl))
+
+    #==============================
+    # click next
+    #==============================
 
     try:
         child = browser.find_element_by_xpath('//a[contains(text(), "Next")]')

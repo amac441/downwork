@@ -11,9 +11,13 @@ def cleanup(rs):
     print(shape.df2)
 
     df2.head()
-    renamecolumns={'imageurl': 'portrait_50','profileurl': 'id','wage': 'rate','status': 'feedback','location': 'country'}
-    df2=df2.rename(columns=renamecolumns)
-    df2['profileID']=df2['id'].str.split('~').str[1]
+    try:
+        renamecolumns={'imageurl': 'portrait_50','profileurl': 'id','wage': 'rate','status': 'feedback','location': 'country'}
+        df2=df2.rename(columns=renamecolumns)
+        df2['profileID']=df2['id'].str.split('~').str[1]
+    except:
+        print "Column headers werent as expected"
+
     # df2.to_csv('manual_$s.csv' % date)
     #
     return df2
@@ -38,8 +42,12 @@ rs=pd.read_csv(file,encoding = "ISO-8859-1", delimiter=";",error_bad_lines=False
 
 if sys.argv[1]=='cleanup':
 
-    cleanup(rs)
+    rd=cleanup(rs)
 
 if sys.argv[1]=='used':
 
-    markused(rs)
+    rs=cleanup(rs)
+    rd=markused(rs)
+
+final2=rd.drop_duplicates(subset='id')
+final2.to_csv("clean_"+file)
