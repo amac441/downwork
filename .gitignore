@@ -21,6 +21,14 @@ sdist/
 var/
 api/
 venv/
+__pycache__/
+ipython/
+manual_people/
+archived_manual/
+datafiles/
+venv/
+api/
+proposals/
 *.egg-info/
 .installed.cfg
 *.egg

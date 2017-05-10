@@ -34,7 +34,8 @@ browser.get('https://www.upwork.com')
 
 # list.find_element_by_class_name()
 filename = raw_input("Log into upwork, set your search criteria, type your desired output filename and press enter ")
-f = open('manual_people/%s_%s.csv' % (dater, filename), 'w')
+writefile='%s_%s.csv' % (dater, filename)
+f = open(writefile, 'w')
 # renamecolumns={'imageurl': 'portrait_50','profileurl': 'id','wage': 'rate','status': 'feedback','location': 'country'}
 # df2.head()
 f.write('imageurl;profileurl;name;title;description;wage;earned;status;location\n')
@@ -60,23 +61,34 @@ while nextbutton == True:
 
         content = p.find_element_by_class_name('col-md-9')
         namediv = content.find_element_by_tag_name('a')
-        name = namediv.text
+        try:
+            name = namediv.text.decode('utf-8', 'ignore')
+        except:
+            name=''
+
         profileurl = namediv.get_attribute('href')
 
-        title = content.find_element_by_tag_name('strong').text
+        try:
+            title = content.find_element_by_tag_name('strong').text.decode('utf-8', 'ignore')
+        except:
+            title=''
         # print(name,profileurl,title)
         try:
             print name
         except:
             print "Can't Display Name"
-        description = content.find_element_by_xpath('//p[@data-qa="tile_description"]').text
+
+        try:
+            description = content.find_element_by_xpath('//p[@data-qa="tile_description"]').text.decode('utf-8', 'ignore')
+        except:
+            description = ''
         # print(description)
 
         details = content.find_element_by_class_name('m-0-bottom')
         detailslist = ['wage', 'earned', 'success(opt)', 'location']
         detailsvals = []
         for d in details.find_elements_by_class_name('col-md-3'):
-            t = d.text.strip()
+            t = d.text.strip().decode('utf-8', 'ignore')
             # print(t)
             detailsvals.append(t)
 
@@ -111,4 +123,38 @@ while nextbutton == True:
     print count
 
 
-print "Results are at " + 'manual_people/%s_%s.csv' % (dater, filename)
+print "Results are at " + '%s_%s.csv' % (dater, filename)
+
+
+clean=raw_input("Run Cleanup (Y/N)? ")
+
+if 'n' in clean.lower():
+    self.exit(0)
+
+import pandas as pd
+from MutiprocessDataframe import callfunction
+import numpy as np
+
+infile=writefile
+rs=pd.read_csv(infile,encoding = "ISO-8859-1", delimiter=";",error_bad_lines=False)
+renamecolumns={'imageurl': 'portrait_50','profileurl': 'id','wage': 'rate','status': 'feedback','location': 'country'}
+newdf=rs.rename(columns=renamecolumns)
+newdf['profileID']=newdf['id'].str.split('~').str[1]
+newdf['profileID']=str("'")+newdf['profileID']
+
+#merge in used accounts
+used_list=['Batch_1_159.csv','pilot04062017.csv','2017_4_6_manual_details.csv','freelancers_messaged_before.csv']
+used_list=os.listdir('used_people')
+
+cols =['id','alreadyUsed']
+dfused=pd.DataFrame(columns=cols)
+for u in used_list:
+    df=pd.read_csv('used_people/'+u)
+    df['alreadyUsed']='T'
+    df2=df[cols]
+    dfused=dfused.append(df2)
+
+dfused=dfused.drop_duplicates()
+final=newdf.merge(dfused,on=['id'],how="left")
+final2=final.drop_duplicates(subset='id')
+final2.to_csv(writefile)
