@@ -578,6 +578,8 @@ def read_message(browser=browser,ms='',decline=False):
     checkcaptcha()
     time.sleep(2)
     proposals={}
+    count=0
+    urlcount=0
 
     try:
         table=browser.find_element_by_xpath('*[@id="room-main-body"]/div[2]/ui-view/div/table/tbody')
@@ -596,6 +598,7 @@ def read_message(browser=browser,ms='',decline=False):
     act = webdriver.common.action_chains.ActionChains(browser)
 
     for item in table.find_elements_by_tag_name('li'):
+        count+=1
         name=item.find_element_by_class_name('room-list-name-span').text
         print (name)
         fname=name.split("\n",1)[1]
@@ -670,12 +673,13 @@ def read_message(browser=browser,ms='',decline=False):
             # browser.find_elements_by_xpath('//div[@class="story-author"]')[-1].click()
             profile_url=get_profile_url(browser)
 
-            if profile_url==None:
+            if 'http' not in profile_url:
                 time.sleep(3)
                 profile_url=get_profile_url(browser)
-                if profile_url==None:
+                if 'http' not in profile_url:
                     print ("==== No Profile URL.  Get Manually For %s =====" % name)
             else:
+                urlcount+=1
                 print (profile_url)
 
             #{Name:[data],Name:[data]}
@@ -904,7 +908,7 @@ if __name__ == "__main__":
                 batchsize=int(row[4])
                 login(params,browser)
                 try:
-                    proplist=read_message(browser)
+                    urlcount,count,proplist=read_message(browser)
                     proplist2=proposals(proplist,browser)
                 except:
                     try:
@@ -917,6 +921,9 @@ if __name__ == "__main__":
                 # propout = open('proput.txt','w')
                 # propout.write(str(proplist2))
                 # propout.close()
+                if urlcount<count:
+                    print ('==== THERE SEEMS TO BE A MISSING URL IN THE ABOVE BATCH ======')
+                    print ('==== PLEASE CHECK MESSAGE COUNT CAREFULLY               ======')
 
                 df2=dfout[num-1:num*batchsize] #slice df
                 for p in proplist2:
