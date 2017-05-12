@@ -850,24 +850,27 @@ if __name__ == "__main__":
             "I have to cancel the project. I am sorry for the inconvenience."
 
         for index,row in input.iterrows():
-            num=int(row['id'])
-            if num!=0:
-                row=list(row)
-                if 'fire' in brow.lower():
-                    browser = webdriver.Firefox(firefox_profile=fp)
-                else:
-                    browser = webdriver.Chrome(executable_path = path_to_chromedriver)
+            try:
+                num=int(row['id'])
+                if num!=0:
+                    row=list(row)
+                    if 'fire' in brow.lower():
+                        browser = webdriver.Firefox(firefox_profile=fp)
+                    else:
+                        browser = webdriver.Chrome(executable_path = path_to_chromedriver)
 
-                params=[row[1],row[2]]
-                login(params,browser)
-                try:
-                    proplist=read_message(browser,mes,True)
-                except:
+                    params=[row[1],row[2]]
+                    login(params,browser)
                     try:
-                        raw_input('Retry? ')
                         proplist=read_message(browser,mes,True)
                     except:
-                        pass
+                        try:
+                            raw_input('Retry? ')
+                            proplist=read_message(browser,mes,True)
+                        except:
+                            pass
+            except:
+                pass
 
     #=======================================
     # Iterate and read all responses
