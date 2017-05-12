@@ -59,6 +59,7 @@ path_to_chromedriver = r"chromedriver.exe"
 #=========Login==============
 
 def checkcaptcha(params=[]):
+    time.sleep(2)
     try:
         recap=browser.find_element_by_class_name("g-recaptcha")
         raw_input("Press Enter when Captcha bypassed")
@@ -66,7 +67,7 @@ def checkcaptcha(params=[]):
         pass
 
     try:
-        if "Log" in browser.find_element_by_xpath('//*[@id="layout"]/div[2]/div/h1[1]').text:
+        if "Log in" in browser.find_element_by_xpath('//*[@id="layout"]/div[2]/div/h1[1]').text:
             #login(params,browser)
             raw_input("Manually Login and Press Enter ")
     except:
@@ -672,9 +673,10 @@ def read_message(browser=browser,ms='',decline=False):
             if profile_url==None:
                 time.sleep(3)
                 profile_url=get_profile_url(browser)
-
                 if profile_url==None:
                     print ("==== No Profile URL.  Get Manually For %s =====" % name)
+            else:
+                print (profile_url)
 
             #{Name:[data],Name:[data]}
             try:
@@ -795,7 +797,12 @@ if __name__ == "__main__":
         # for row in reader:
         mod=11   #if mode less than 11
         dataframe=findMembers(dfresource,start,stop,invitemessagetext,amount,create,negot,mod)
-        dataframe.to_csv(outfile)
+        # dataframe.to_csv(outfile)
+        try:
+            dataframe.to_csv(outfile,encoding='utf-8')
+        except:
+            raw_input("There was an error writing output.  Make sure %s is closed (Enter to try again)" % outfile)
+            dataframe.to_csv(outfile,encoding='utf-8')
         #dataframe.to_csv(dater+"_manual_details.csv")
         raw_input("Done with Details")
         browser.close()
@@ -929,7 +936,8 @@ if __name__ == "__main__":
         try:
             dfout.to_csv(outfile,encoding='utf-8')
         except:
-            dfout.to_csv(outfile,sep='\t',encoding='utf-8')
+            raw_input("There was an error writing output.  Makesure %s is closed (Enter to try again)" % outfile)
+            dfout.to_csv(outfile,encoding='utf-8')
 
         sys.exit(0)
 
@@ -952,7 +960,12 @@ if __name__ == "__main__":
         dfresource['login']=params[0]
         dfresource['password']=params[1]
         dataframe=findMembers(dfresource,start,stop,invitemessagetext,amount,create,negot)
-        dataframe.to_csv(outfile)
+        # dataframe.to_csv(outfile)
+        try:
+            dataframe.to_csv(outfile,encoding='utf-8')
+        except:
+            raw_input("There was an error writing output.  Make sure %s is closed (Enter to try again)" % outfile)
+            dataframe.to_csv(outfile,encoding='utf-8')
         print("--- %s seconds ---" % (time.time() - start_time))
 
     elif type=='read':
