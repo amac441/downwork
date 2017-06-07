@@ -138,14 +138,15 @@ while nextbutton == True:
             namediv = content.find_element_by_tag_name('a')
 
             try:
-                name = namediv.text.decode('utf-8', 'ignore').replace(",",".")
+                name = namediv.text.decode('utf-8', 'ignore').replace(",",".").replace('"','').replace("'",'')
+
             except:
                 name=''
 
             profileurl = namediv.get_attribute('href')
 
             try:
-                title = content.find_element_by_tag_name('strong').text.decode('utf-8', 'ignore').replace(",",".")
+                title = content.find_element_by_tag_name('strong').text.decode('utf-8', 'ignore').replace(",",".").replace('"','').replace("'",'')
             except:
                 title=''
             # print(name,profileurl,title)
@@ -158,7 +159,7 @@ while nextbutton == True:
                 # description = content.find_element_by_xpath('//p[@data-qa="tile_description"]').text.decode('utf-8', 'ignore')
                 # p-0-left
                 description=''
-                description = content.find_element_by_class_name('p-0-left').text.decode('utf-8', 'ignore').replace(",",".")
+                description = content.find_element_by_class_name('p-0-left').text.decode('utf-8', 'ignore').replace(",",".").replace('"','').replace("'",'')
             except:
                 description = ''
             # print(description)
@@ -167,7 +168,7 @@ while nextbutton == True:
             detailslist = ['wage', 'earned', 'success(opt)', 'location']
             detailsvals = []
             for d in details.find_elements_by_class_name('col-md-3'):
-                t = d.text.strip().decode('utf-8', 'ignore').replace(",",".")
+                t = d.text.strip().decode('utf-8', 'ignore').replace(",",".").replace('"','').replace("'",'')
                 # print(t)
                 detailsvals.append(t)
 

@@ -48,6 +48,19 @@ def markused(rd):
 
 file=sys.argv[2]
 
+f=open(file,'r')
+f2=open('temp.csv','w')
+
+for line in f:
+    line=line.replace('"','')
+    line=line.replace("'",'')
+    f2.write(line)
+
+f.close()
+f2.close()
+os.remove(file)
+os.rename('temp.csv',file)
+
 if sys.argv[1]=='cleanup':
     rs=pd.read_csv(file,encoding = "ISO-8859-1",error_bad_lines=False)
     rd=cleanup(rs)
