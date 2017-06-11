@@ -44,9 +44,9 @@ fp = webdriver.FirefoxProfile()
 path_modify_header = 'modify_headers-0.7.1.1-fx.xpi'
 fp.add_extension(path_modify_header)
 fp.set_preference("modifyheaders.headers.count", 1)
-fp.set_preference("modifyheaders.headers.action0", "Add")
-fp.set_preference("modifyheaders.headers.name0", "firefox") # Set here the name of the header
-fp.set_preference("modifyheaders.headers.value0", "20.1") # Set here the value of the header
+fp.set_preference("modifyheaders.headers.action0", "Will")
+fp.set_preference("modifyheaders.headers.name0", "FFOX") # Set here the name of the header
+fp.set_preference("modifyheaders.headers.value0", "20.2") # Set here the value of the header
 fp.set_preference("modifyheaders.headers.enabled0", True)
 fp.set_preference("modifyheaders.config.active", True)
 fp.set_preference("modifyheaders.config.alwaysOn", True)
