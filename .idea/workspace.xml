@@ -32,8 +32,8 @@
       <file leaf-file-name="01-17-upwork_master.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/01-17-upwork_master.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="316">
-              <caret line="700" column="20" lean-forward="true" selection-start-line="700" selection-start-column="20" selection-end-line="700" selection-end-column="20" />
+            <state relative-caret-position="168">
+              <caret line="927" column="42" lean-forward="true" selection-start-line="927" selection-start-column="42" selection-end-line="927" selection-end-column="42" />
               <folding />
             </state>
           </provider>
@@ -94,7 +94,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>='de</find>
       <find>login(</find>
       <find>details</find>
       <find>st</find>
@@ -124,6 +123,7 @@
       <find>replace</find>
       <find>urlcount</find>
       <find>retry?</find>
+      <find>retry</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -929,8 +929,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/01-17-upwork_master.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="316">
-          <caret line="700" column="20" lean-forward="true" selection-start-line="700" selection-start-column="20" selection-end-line="700" selection-end-column="20" />
+        <state relative-caret-position="168">
+          <caret line="927" column="42" lean-forward="true" selection-start-line="927" selection-start-column="42" selection-end-line="927" selection-end-column="42" />
           <folding />
         </state>
       </provider>
