@@ -690,7 +690,7 @@ def read_message(browser=browser,ms='',decline=False):
         except:
             pass
 
-    return proposals
+    return urlcount,count,proposals
 
 #=======================================
 # Change encoding
@@ -865,6 +865,7 @@ if __name__ == "__main__":
 
                     params=[row[1],row[2]]
                     login(params,browser)
+                    proplist=read_message(browser,mes,True)
                     try:
                         proplist=read_message(browser,mes,True)
                     except:
@@ -907,6 +908,9 @@ if __name__ == "__main__":
                 params=[row[1],row[2]]
                 batchsize=int(row[4])
                 login(params,browser)
+
+                urlcount,count,proplist=read_message(browser)
+                proplist2=proposals(proplist,browser)
                 try:
                     urlcount,count,proplist=read_message(browser)
                     proplist2=proposals(proplist,browser)
