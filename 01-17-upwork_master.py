@@ -946,6 +946,10 @@ if __name__ == "__main__":
                         # lname=name[1][0] #first initial
                         # name2=fname+" "+lname
                         dfindex=df2[df2['id'].str.contains(p.split('~')[1])].index
+                        if len(dfindex)==0:
+                            dfindex=df2[df2['profileid'].str.contains(p.split('~')[1])].index
+                            if len(dfindex)==0:
+                                print("Couldn't Match Pofile ID")
                         dfout.loc[dfindex,'MessageTime']=proplist[p][1]
                         dfout.loc[dfindex,'MessageText']=proplist[p][2] #text
                         dfout.loc[dfindex,'ProposalAmount']=proplist[p][5] #amount
