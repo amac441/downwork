@@ -937,7 +937,7 @@ if __name__ == "__main__":
                     print ('==== THERE SEEMS TO BE A MISSING URL IN THE ABOVE BATCH ======')
                     print ('==== PLEASE CHECK MESSAGE COUNT CAREFULLY               ======')
 
-                df2=dfout[num-1:num*batchsize] #slice df
+                df2=dfout #[num-1:num*batchsize] #slice df
                 for p in proplist2:
                     try:
                         # pr = p.split("\n")[1]
@@ -945,13 +945,13 @@ if __name__ == "__main__":
                         # fname=name[0]
                         # lname=name[1][0] #first initial
                         # name2=fname+" "+lname
-                        dfindex=df2[df2.profileid.str.contains("'"+p.split('~')[1])].index
+                        dfindex=df2[df2['id'].str.contains(p.split('~')[1])].index
                         dfout.loc[dfindex,'MessageTime']=proplist[p][1]
                         dfout.loc[dfindex,'MessageText']=proplist[p][2] #text
                         dfout.loc[dfindex,'ProposalAmount']=proplist[p][5] #amount
                         a=1
                     except:
-                        pass
+                        print "Error Finding Data" + str(p.split('~')[1])
                 browser.close()
 
         dfout= changeencode(dfout)
