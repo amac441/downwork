@@ -552,7 +552,10 @@ def proposals(proplist,browser=browser):
                     try:
                         amt=browser.find_element_by_xpath("//h1[@class='m-0-top']").text
                     except:
-                        amt=browser.find_element_by_xpath("/html/body/div[3]/div[1]/div/div[2]/div/div[1]/div[1]/div/div[1]/div[3]/h1").text
+                        try:
+                            amt=browser.find_element_by_xpath("/html/body/div[3]/div[1]/div/div[2]/div/div[1]/div[1]/div/div[1]/div[3]/h1").text
+                        except:
+                            print "Can't read Proposal Amount"
                 list.append(amt)
                 proplist[prop]=list
             except:
