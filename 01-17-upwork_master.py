@@ -545,7 +545,14 @@ def proposals(proplist,browser=browser):
                 browser.get(url)
                 time.sleep(4)
                 checkcaptcha()
-                amt=browser.find_element_by_xpath('//*[@id="layout"]/div[2]/div[2]/div/div/div[2]/div/div[1]/div[1]/div/div[1]/div[3]/h1').text
+                try:
+                    amt=browser.find_element_by_xpath('//*[@id="layout"]/div[2]/div[2]/div/div/div[2]/div/div[1]/div[1]/div/div[1]/div[3]/h1').text
+                                                        #/html/body/div[3]/div[1]/div/div[2]/div/div[1]/div[1]/div/div[1]/div[3]/h1
+                except:
+                    try:
+                        amt=browser.find_element_by_xpath("//h1[@class='m-0-top']").text
+                    except:
+                        amt=browser.find_element_by_xpath("/html/body/div[3]/div[1]/div/div[2]/div/div[1]/div[1]/div/div[1]/div[3]/h1").text
                 list.append(amt)
                 proplist[prop]=list
             except:
@@ -915,7 +922,7 @@ if __name__ == "__main__":
                 except:
                     try:
                         raw_input('Retry? ')
-                        proplist=read_message(browser)
+                        urlcount,count,proplist=read_message(browser)
                         proplist2=proposals(proplist,browser)
                     except:
                         print 'twice crashed - writing what we have'
