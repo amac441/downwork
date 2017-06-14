@@ -900,6 +900,8 @@ if __name__ == "__main__":
 
         for index,row in input.iterrows():
 
+            raw_input("Pick a new PureVPN Location. Press Enter When Ready to Proceed")
+
             try:
                 num=int(row['id'])
             except:
@@ -915,6 +917,7 @@ if __name__ == "__main__":
                 else:
                     browser = webdriver.Chrome(executable_path = path_to_chromedriver)
 
+                browser.set_window_size(1920, 1080)
                 params=[row[1],row[2]]
                 batchsize=int(row[4])
                 login(params,browser)
@@ -933,6 +936,8 @@ if __name__ == "__main__":
                 # propout = open('proput.txt','w')
                 # propout.write(str(proplist2))
                 # propout.close()
+                print ("Count" + str(count))
+                print ("URLS" + str(urlcount))
                 if urlcount<count:
                     print ('==== THERE SEEMS TO BE A MISSING URL IN THE ABOVE BATCH ======')
                     print ('==== PLEASE CHECK MESSAGE COUNT CAREFULLY               ======')
@@ -945,14 +950,16 @@ if __name__ == "__main__":
                         # fname=name[0]
                         # lname=name[1][0] #first initial
                         # name2=fname+" "+lname
-                        dfindex=df2[df2['id'].str.contains(p.split('~')[1])].index
+                        scrapedid=p.split('~')[1]
+                        dfindex=df2[df2['id'].str.contains(scrapedid)].index
                         if len(dfindex)==0:
-                            dfindex=df2[df2['profileid'].str.contains(p.split('~')[1])].index
+                            dfindex=df2[df2['profileid'].str.contains(scrapedid)].index
                             if len(dfindex)==0:
-                                print("Couldn't Match Pofile ID")
+                                print("Couldn't Match Pofile ID" + str(scrapedid))
                         dfout.loc[dfindex,'MessageTime']=proplist[p][1]
                         dfout.loc[dfindex,'MessageText']=proplist[p][2] #text
                         dfout.loc[dfindex,'ProposalAmount']=proplist[p][5] #amount
+                        dfout.loc[dfindex,'ScrapedID']=scrapedid
                         a=1
                     except:
                         print "Error Finding Data" + str(p.split('~')[1])
